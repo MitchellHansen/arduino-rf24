@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <util/setbaud.h>
-#define LED PORTB5
-#define WIRE PORTB0
+#define LED PORTD2
+#define WIRE PORTD3
 
 
 void uart_init() {
@@ -39,23 +39,23 @@ int main(void) {
     
     uart_init();
 
-    DDRB |= (1 << LED);
-    DDRB |= (1 << WIRE);
+	DDRC &= ~(1<<0); // Input
+	PORTC |= (1<<0); // Enable Internal Pull Up (Setting it to HIGH)
+
+    DDRD |= (1 << WIRE);
+
     for(;;){
             
-
         uart_putstr("hello\n");
-        
-        _delay_ms(100);
-        
-        PORTB |= (1 << LED);
-        PORTB |= (1 << WIRE);
-        
-        _delay_ms(100);
-        
-        PORTB &= (0 << LED);
-        PORTB &= (0 << WIRE);
+        _delay_ms(900);
+        PORTD |= (1 << WIRE);
+        _delay_ms(900);
+        PORTD &= (0 << WIRE);
     
+        uint8_t port_value = 0;
+        port_value = PINC & (1 << 0);
+        uart_putchar((char)port_value);
+        uart_putstr("\n");
     }
 
 }
