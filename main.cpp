@@ -50,8 +50,7 @@ const char thisSlaveAddress[5] = {'R','x','A','A','A'};
 int main(void) {
     digitalWrite(10, 10);
 
-    RF24 value(CE_PIN, CSN_PIN);
-    uart_init();
+        uart_init();
 
 	DDRC &= ~(1<<0); // Input
 	PORTC |= (1<<0); // Enable Internal Pull Up (Setting it to HIGH)
@@ -63,7 +62,11 @@ int main(void) {
     PORTD |= _BV(DIRECTION);
    
     for(;;){
-            
+     RF24 radio(CE_PIN, CSN_PIN);
+    radio.begin();
+    radio.setDataRate(RF24_1MBPS);
+
+       
 //        uart_putstr("hello\n");
         _delay_ms(400);
         PORTD |= _BV(PULL);
