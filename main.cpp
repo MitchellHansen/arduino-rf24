@@ -3,6 +3,13 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <util/setbaud.h>
+#include <Arduino.h>
+
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+#define CE_PIN 7
+#define CSN_PIN 8
 
 #define LED PORTD2
 #define PULL PORTD3
@@ -38,9 +45,12 @@ void uart_putstr(char *data) {
 }
 
 
+const char thisSlaveAddress[5] = {'R','x','A','A','A'};
 
 int main(void) {
-    
+    digitalWrite(10, 10);
+
+    RF24 value(CE_PIN, CSN_PIN);
     uart_init();
 
 	DDRC &= ~(1<<0); // Input
