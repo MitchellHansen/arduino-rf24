@@ -76,7 +76,8 @@ endif
 ifndef F_CPU
 F_CPU = 16000000
 endif
-CFLAGS += -D F_CPU=$(F_CPU) -D ARDUINO
+
+CFLAGS += -D F_CPU=$(F_CPU) -D ARDUINO -D ROLE=$(ROLE)
 
 # hardware/arduino/avr/libraries/SPI/src/SPI.cpp:
 

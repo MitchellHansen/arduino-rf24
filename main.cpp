@@ -8,14 +8,15 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-#define CE_PIN 7
-#define CSN_PIN 8
+//#define CE_PIN 7
+#define CE_PIN 3
+//#define CS_PIN 8
+#define CS_PIN 2
 
 #define LED PORTD2
 #define PULL PORTD3
 #define ENABLE PORTD5
 #define DIRECTION PORTD6
-
 
 void uart_init() {
     // Upper and lower bytes of the calculated prescaler value for baud.
@@ -45,38 +46,94 @@ void uart_putstr(char *data) {
 }
 
 
-const char thisSlaveAddress[5] = {'R','x','A','A','A'};
+const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
+
+int radio_number = ROLE;
+int role = ROLE;
 
 int main(void) {
-    digitalWrite(10, 10);
 
-        uart_init();
-
-	DDRC &= ~(1<<0); // Input
-	PORTC |= (1<<0); // Enable Internal Pull Up (Setting it to HIGH)
-
-//    DDRD |= (1 << ENABLE);
-    DDRD = DDRD | 0xFC;
-   
-    PORTD |= _BV(ENABLE);
-    PORTD |= _BV(DIRECTION);
-   
-    for(;;){
-     RF24 radio(CE_PIN, CSN_PIN);
-    radio.begin();
-    radio.setDataRate(RF24_1MBPS);
-
-       
-//        uart_putstr("hello\n");
-        _delay_ms(400);
-        PORTD |= _BV(PULL);
-        _delay_ms(400);
-        PORTD &= ~_BV(PULL);
+    uart_init();
     
-        uint8_t port_value = 2;
-//        port_value = PINC & (1 << 0);
-        uart_putchar((char)port_value);
-//        uart_putchar((char)'\n');
+//    pinMode(LED_BUILTIN, OUTPUT);
+//    digitalWrite(LED_BUILTIN, LOW);
+
+    RF24 radio(CE_PIN, CS_PIN);
+    radio.begin();
+
+    if(radio_number) {
+        radio.openWritingPipe(pipes[1]);
+        radio.openReadingPipe(1,pipes[0]);
+    } else {
+        radio.openWritingPipe(pipes[0]);
+        radio.openReadingPipe(1,pipes[1]);
     }
 
+    radio.startListening();
+
+    
+
+    int i = 0;
+    for(;;) {
+    
+        unsigned long start_time = micros();
+        // ping
+        if (role == 1) {
+            radio.stopListening();
+
+//            uart_putstr("Now sending\n");
+//            digitalWrite(LED_BUILTIN, HIGH);
+//           _delay_ms(100);
+//            digitalWrite(LED_BUILTIN, LOW);
+            
+            if (!radio.write( &start_time, sizeof(unsigned long))) {
+//                uart_putstr("failed\n");
+            }
+        
+        
+            radio.startListening();
+            unsigned long started_waiting_at = micros();
+            boolean timeout = false;
+            
+            while (!radio.available()) {
+                if (micros() - started_waiting_at > 20000) {
+                    timeout = true;
+                    break;
+                }
+            }
+            
+            if (timeout) { 
+//                uart_putstr("Failed, reponse timed out\n");
+            } else {
+                unsigned long got_time;
+                radio.read( & got_time, sizeof(unsigned long));
+                unsigned long end_time = micros();
+            
+//                uart_putstr("Got response\n");
+            
+            }
+        
+            delay(500);
+        
+        } 
+        
+        // ping bag 
+        if (role == 0) {
+            unsigned long got_time;
+            if (radio.available()) {
+                while (radio.available()) {
+                    radio.read( &got_time, sizeof(unsigned long));
+                }
+                radio.stopListening();
+                radio.write( & got_time, sizeof(unsigned long));
+                radio.startListening();
+//                uart_putstr("Sent\n");
+                digitalWrite(LED_BUILTIN, HIGH);
+                _delay_ms(100);
+                digitalWrite(LED_BUILTIN, LOW);
+
+
+            }
+        } 
+    }
 }
