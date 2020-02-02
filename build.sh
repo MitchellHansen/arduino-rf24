@@ -1,15 +1,37 @@
 
+
+REMOTEPORT=/dev/ttyUSB0
+DOZERPORT=/dev/ttyUSB1
+
+
+
+
+
 if [ $# -eq 0 ]
     then
-        file=main.c
+        if make -f Makefile.mk ROLE=1; then
+            echo Compilation Good 
+        else
+            echo Compilation Bad
+        fi
     else
-        file=$1
-fi
 
-ofile=$(echo $file | sed "s/\.c/\.o/")
-hexfile=$(echo $file | sed "s/\.c/\.hex/")
+        if [ $1 -eq 1 ]
+            then
+                if make -f Makefile.mk ROLE=1; then
+                    avrdude -v -patmega328p -carduino -P$DOZERPORT -b57600 -D -Uflash:w:main.hex:i
+                else
+                    echo Compilation failed, skipping flash
+            fi
+        elif [ $1 -eq 0 ]
+            then
+                if make -f Makefile.mk ROLE=0; then
+                    avrdude -v -patmega328p -carduino -P$REMOTEPORT -b57600 -D -Uflash:w:main.hex:i
+                else
+                    echo Compilation failed, skipping flash
+            fi
+        fi
+    fi
 
-avr-gcc -Os -DF_CPU=16000000L -DBAUD=9600UL -mmcu=atmega328p $file -o $ofile 
-avr-objcopy -O ihex $ofile $hexfile
-avrdude -v -patmega328p -carduino -P/dev/ttyUSB0 -b57600 -D -Uflash:w:$hexfile:i
-rm $ofile $hexfile
+
+

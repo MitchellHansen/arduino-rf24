@@ -1,0 +1,540 @@
+   1               		.file	"WInterrupts.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 134               	nothing:
+ 135               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** /* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** /*
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Part of the Wiring project - http://wiring.uniandes.edu.co
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Copyright (c) 2004-05 Hernando Barragan
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   This library is free software; you can redistribute it and/or
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   modify it under the terms of the GNU Lesser General Public
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   License as published by the Free Software Foundation; either
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   version 2.1 of the License, or (at your option) any later version.
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   This library is distributed in the hope that it will be useful,
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Lesser General Public License for more details.
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   You should have received a copy of the GNU Lesser General
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Public License along with this library; if not, write to the
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Boston, MA  02111-1307  USA
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Modified 24 November 2006 by David A. Mellis
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   Modified 1 August 2010 by Mark Sproul
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** */
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #include <inttypes.h>
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #include <avr/io.h>
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #include <avr/interrupt.h>
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #include <avr/pgmspace.h>
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #include <stdio.h>
+  32:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+  33:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #include "wiring_private.h"
+  34:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+  35:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** static void nothing(void) {
+ 137               	.LM0:
+ 138               	.LFBB1:
+ 139               	/* prologue: function */
+ 140               	/* frame size = 0 */
+ 141               	/* stack size = 0 */
+ 142               	.L__stack_usage = 0
+ 143 0000 0895      		ret
+ 145               	.Lscope1:
+ 147               		.stabd	78,0,0
+ 152               	.global	attachInterrupt
+ 154               	attachInterrupt:
+ 155               		.stabd	46,0,0
+  36:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** }
+  37:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** static volatile voidFuncPtr intFunc[EXTERNAL_NUM_INTERRUPTS] = {
+  39:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 8
+  40:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #warning There are more than 8 external interrupts. Some callbacks may not be initialized.
+  41:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  42:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  43:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 7
+  44:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  46:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 6
+  47:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  48:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  49:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 5
+  50:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  51:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  52:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 4
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  54:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  55:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 3
+  56:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  57:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  58:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 2
+  59:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  60:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  61:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 1
+  62:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  63:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  64:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if EXTERNAL_NUM_INTERRUPTS > 0
+  65:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     nothing,
+  66:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** };
+  68:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** // volatile static voidFuncPtr twiIntFunc;
+  69:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+  70:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
+ 157               	.LM1:
+ 158               	.LFBB2:
+ 159               	/* prologue: function */
+ 160               	/* frame size = 0 */
+ 161               	/* stack size = 0 */
+ 162               	.L__stack_usage = 0
+  71:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
+ 164               	.LM2:
+ 165 0002 8230      		cpi r24,lo8(2)
+ 166 0004 00F4      		brsh .L2
+  72:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     intFunc[interruptNum] = userFunc;
+ 168               	.LM3:
+ 169 0006 E82F      		mov r30,r24
+ 170 0008 F0E0      		ldi r31,0
+ 171 000a EE0F      		lsl r30
+ 172 000c FF1F      		rol r31
+ 173 000e E050      		subi r30,lo8(-(intFunc))
+ 174 0010 F040      		sbci r31,hi8(-(intFunc))
+ 175 0012 7183      		std Z+1,r23
+ 176 0014 6083      		st Z,r22
+  73:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     
+  74:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // Configure the interrupt mode (trigger on low input, any change, rising
+  75:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // edge, or falling edge).  The mode constants were chosen to correspond
+  76:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // to the configuration bits in the hardware register, so we simply shift
+  77:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // the mode into place.
+  78:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       
+  79:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // Enable the interrupt.
+  80:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       
+  81:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     switch (interruptNum) {
+ 178               	.LM4:
+ 179 0016 8130      		cpi r24,lo8(1)
+ 180 0018 01F0      		breq .L5
+  82:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if defined(__AVR_ATmega32U4__)
+  83:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	// I hate doing this, but the register assignment differs between the 1280/2560
+  84:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	// and the 32U4.  Since avrlib defines registers PCMSK1 and PCMSK2 that aren't 
+  85:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	// even present on the 32U4 this is the only way to distinguish between them.
+  86:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 0:
+  87:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	EICRA = (EICRA & ~((1<<ISC00) | (1<<ISC01))) | (mode << ISC00);
+  88:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	EIMSK |= (1<<INT0);
+  89:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	break;
+  90:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 1:
+  91:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	EICRA = (EICRA & ~((1<<ISC10) | (1<<ISC11))) | (mode << ISC10);
+  92:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	EIMSK |= (1<<INT1);
+  93:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 	break;	
+  94:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 2:
+  95:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EICRA = (EICRA & ~((1<<ISC20) | (1<<ISC21))) | (mode << ISC20);
+  96:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK |= (1<<INT2);
+  97:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;
+  98:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 3:
+  99:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EICRA = (EICRA & ~((1<<ISC30) | (1<<ISC31))) | (mode << ISC30);
+ 100:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK |= (1<<INT3);
+ 101:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;
+ 102:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 4:
+ 103:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EICRB = (EICRB & ~((1<<ISC60) | (1<<ISC61))) | (mode << ISC60);
+ 104:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK |= (1<<INT6);
+ 105:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;
+ 106:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #elif defined(EICRA) && defined(EICRB) && defined(EIMSK)
+ 107:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 2:
+ 108:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
+ 109:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT0);
+ 110:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 111:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 3:
+ 112:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (mode << ISC10);
+ 113:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT1);
+ 114:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 115:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 4:
+ 116:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRA = (EICRA & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
+ 117:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT2);
+ 118:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 119:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 5:
+ 120:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRA = (EICRA & ~((1 << ISC30) | (1 << ISC31))) | (mode << ISC30);
+ 121:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT3);
+ 122:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 123:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 0:
+ 124:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRB = (EICRB & ~((1 << ISC40) | (1 << ISC41))) | (mode << ISC40);
+ 125:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT4);
+ 126:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 127:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 1:
+ 128:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRB = (EICRB & ~((1 << ISC50) | (1 << ISC51))) | (mode << ISC50);
+ 129:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT5);
+ 130:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 131:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 6:
+ 132:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRB = (EICRB & ~((1 << ISC60) | (1 << ISC61))) | (mode << ISC60);
+ 133:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT6);
+ 134:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 135:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 7:
+ 136:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRB = (EICRB & ~((1 << ISC70) | (1 << ISC71))) | (mode << ISC70);
+ 137:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT7);
+ 138:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 139:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #else		
+ 140:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 0:
+ 141:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #if defined(EICRA) && defined(ISC00) && defined(EIMSK)
+ 142:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
+ 182               	.LM5:
+ 183 001a 8091 6900 		lds r24,105
+ 184 001e 8C7F      		andi r24,lo8(-4)
+ 185 0020 482B      		or r20,r24
+ 186 0022 4093 6900 		sts 105,r20
+ 143:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT0);
+ 188               	.LM6:
+ 189 0026 E89A      		sbi 0x1d,0
+ 144:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(MCUCR) && defined(ISC00) && defined(GICR)
+ 145:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       MCUCR = (MCUCR & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
+ 146:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GICR |= (1 << INT0);
+ 147:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(MCUCR) && defined(ISC00) && defined(GIMSK)
+ 148:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       MCUCR = (MCUCR & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
+ 149:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GIMSK |= (1 << INT0);
+ 150:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #else
+ 151:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       #error attachInterrupt not finished for this CPU (case 0)
+ 152:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #endif
+ 153:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 191               	.LM7:
+ 192 0028 0895      		ret
+ 193               	.L5:
+ 154:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 155:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 1:
+ 156:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #if defined(EICRA) && defined(ISC10) && defined(ISC11) && defined(EIMSK)
+ 157:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (mode << ISC10);
+ 195               	.LM8:
+ 196 002a 8091 6900 		lds r24,105
+ 197 002e 837F      		andi r24,lo8(-13)
+ 198 0030 440F      		lsl r20
+ 199 0032 551F      		rol r21
+ 200 0034 440F      		lsl r20
+ 201 0036 551F      		rol r21
+ 202 0038 482B      		or r20,r24
+ 203 003a 4093 6900 		sts 105,r20
+ 158:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT1);
+ 205               	.LM9:
+ 206 003e E99A      		sbi 0x1d,1
+ 207               	.L2:
+ 208 0040 0895      		ret
+ 210               	.Lscope2:
+ 212               		.stabd	78,0,0
+ 215               	.global	detachInterrupt
+ 217               	detachInterrupt:
+ 218               		.stabd	46,0,0
+ 159:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(MCUCR) && defined(ISC10) && defined(ISC11) && defined(GICR)
+ 160:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       MCUCR = (MCUCR & ~((1 << ISC10) | (1 << ISC11))) | (mode << ISC10);
+ 161:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GICR |= (1 << INT1);
+ 162:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(MCUCR) && defined(ISC10) && defined(GIMSK) && defined(GIMSK)
+ 163:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       MCUCR = (MCUCR & ~((1 << ISC10) | (1 << ISC11))) | (mode << ISC10);
+ 164:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GIMSK |= (1 << INT1);
+ 165:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #else
+ 166:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       #warning attachInterrupt may need some more work for this cpu (case 1)
+ 167:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #endif
+ 168:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 169:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     
+ 170:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 2:
+ 171:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #if defined(EICRA) && defined(ISC20) && defined(ISC21) && defined(EIMSK)
+ 172:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EICRA = (EICRA & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
+ 173:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK |= (1 << INT2);
+ 174:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(MCUCR) && defined(ISC20) && defined(ISC21) && defined(GICR)
+ 175:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       MCUCR = (MCUCR & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
+ 176:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GICR |= (1 << INT2);
+ 177:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(MCUCR) && defined(ISC20) && defined(GIMSK) && defined(GIMSK)
+ 178:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       MCUCR = (MCUCR & ~((1 << ISC20) | (1 << ISC21))) | (mode << ISC20);
+ 179:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GIMSK |= (1 << INT2);
+ 180:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #endif
+ 181:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 182:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+ 183:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     }
+ 184:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   }
+ 185:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** }
+ 186:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 187:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** void detachInterrupt(uint8_t interruptNum) {
+ 220               	.LM10:
+ 221               	.LFBB3:
+ 222               	/* prologue: function */
+ 223               	/* frame size = 0 */
+ 224               	/* stack size = 0 */
+ 225               	.L__stack_usage = 0
+ 188:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
+ 227               	.LM11:
+ 228 0042 8230      		cpi r24,lo8(2)
+ 229 0044 00F4      		brsh .L7
+ 189:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // Disable the interrupt.  (We can't assume that interruptNum is equal
+ 190:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // to the number of the EIMSK bit to clear, as this isn't true on the 
+ 191:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     // ATmega8.  There, INT0 is 6 and INT1 is 7.)
+ 192:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     switch (interruptNum) {
+ 231               	.LM12:
+ 232 0046 8130      		cpi r24,lo8(1)
+ 233 0048 01F0      		breq .L10
+ 193:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if defined(__AVR_ATmega32U4__)
+ 194:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 0:
+ 195:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK &= ~(1<<INT0);
+ 196:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;
+ 197:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 1:
+ 198:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK &= ~(1<<INT1);
+ 199:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;
+ 200:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 2:
+ 201:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK &= ~(1<<INT2);
+ 202:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;
+ 203:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 3:
+ 204:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK &= ~(1<<INT3);
+ 205:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;	
+ 206:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 4:
+ 207:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         EIMSK &= ~(1<<INT6);
+ 208:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****         break;	
+ 209:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #elif defined(EICRA) && defined(EICRB) && defined(EIMSK)
+ 210:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 2:
+ 211:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT0);
+ 212:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 213:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 3:
+ 214:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT1);
+ 215:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 216:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 4:
+ 217:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT2);
+ 218:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 219:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 5:
+ 220:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT3);
+ 221:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 222:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 0:
+ 223:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT4);
+ 224:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 225:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 1:
+ 226:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT5);
+ 227:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 228:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 6:
+ 229:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT6);
+ 230:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 231:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 7:
+ 232:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT7);
+ 233:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 234:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #else
+ 235:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 0:
+ 236:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #if defined(EIMSK) && defined(INT0)
+ 237:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT0);
+ 235               	.LM13:
+ 236 004a E898      		cbi 0x1d,0
+ 238:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(GICR) && defined(ISC00)
+ 239:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GICR &= ~(1 << INT0); // atmega32
+ 240:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(GIMSK) && defined(INT0)
+ 241:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GIMSK &= ~(1 << INT0);
+ 242:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #else
+ 243:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       #error detachInterrupt not finished for this cpu
+ 244:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #endif
+ 245:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 238               	.LM14:
+ 239 004c 00C0      		rjmp .L11
+ 240               	.L10:
+ 246:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 247:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 1:
+ 248:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #if defined(EIMSK) && defined(INT1)
+ 249:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT1);
+ 242               	.LM15:
+ 243 004e E998      		cbi 0x1d,1
+ 244               	.L11:
+ 250:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(GICR) && defined(INT1)
+ 251:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GICR &= ~(1 << INT1); // atmega32
+ 252:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(GIMSK) && defined(INT1)
+ 253:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GIMSK &= ~(1 << INT1);
+ 254:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #else
+ 255:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       #warning detachInterrupt may need some more work for this cpu (case 1)
+ 256:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #endif
+ 257:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;
+ 258:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       
+ 259:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     case 2:
+ 260:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #if defined(EIMSK) && defined(INT2)
+ 261:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       EIMSK &= ~(1 << INT2);
+ 262:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(GICR) && defined(INT2)
+ 263:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GICR &= ~(1 << INT2); // atmega32
+ 264:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(GIMSK) && defined(INT2)
+ 265:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       GIMSK &= ~(1 << INT2);
+ 266:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #elif defined(INT2)
+ 267:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       #warning detachInterrupt may need some more work for this cpu (case 2)
+ 268:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     #endif
+ 269:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       break;       
+ 270:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #endif
+ 271:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     }
+ 272:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****       
+ 273:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     intFunc[interruptNum] = nothing;
+ 246               	.LM16:
+ 247 0050 E82F      		mov r30,r24
+ 248 0052 F0E0      		ldi r31,0
+ 249 0054 EE0F      		lsl r30
+ 250 0056 FF1F      		rol r31
+ 251 0058 E050      		subi r30,lo8(-(intFunc))
+ 252 005a F040      		sbci r31,hi8(-(intFunc))
+ 253 005c 80E0      		ldi r24,lo8(gs(nothing))
+ 254 005e 90E0      		ldi r25,hi8(gs(nothing))
+ 255 0060 9183      		std Z+1,r25
+ 256 0062 8083      		st Z,r24
+ 257               	.L7:
+ 258 0064 0895      		ret
+ 260               	.Lscope3:
+ 262               		.stabd	78,0,0
+ 264               	.global	__vector_1
+ 266               	__vector_1:
+ 267               		.stabd	46,0,0
+ 274:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   }
+ 275:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** }
+ 276:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 277:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** /*
+ 278:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** void attachInterruptTwi(void (*userFunc)(void) ) {
+ 279:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   twiIntFunc = userFunc;
+ 280:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** }
+ 281:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** */
+ 282:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 283:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #define IMPLEMENT_ISR(vect, interrupt) \
+ 284:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   ISR(vect) { \
+ 285:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****     intFunc[interrupt](); \
+ 286:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c ****   }
+ 287:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 288:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #if defined(__AVR_ATmega32U4__)
+ 289:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 290:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT0_vect, EXTERNAL_INT_0)
+ 291:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT1_vect, EXTERNAL_INT_1)
+ 292:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT2_vect, EXTERNAL_INT_2)
+ 293:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT3_vect, EXTERNAL_INT_3)
+ 294:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT6_vect, EXTERNAL_INT_4)
+ 295:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 296:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #elif defined(EICRA) && defined(EICRB)
+ 297:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 298:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT0_vect, EXTERNAL_INT_2)
+ 299:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT1_vect, EXTERNAL_INT_3)
+ 300:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT2_vect, EXTERNAL_INT_4)
+ 301:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT3_vect, EXTERNAL_INT_5)
+ 302:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT4_vect, EXTERNAL_INT_0)
+ 303:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT5_vect, EXTERNAL_INT_1)
+ 304:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT6_vect, EXTERNAL_INT_6)
+ 305:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT7_vect, EXTERNAL_INT_7)
+ 306:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 307:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** #else
+ 308:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** 
+ 309:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT0_vect, EXTERNAL_INT_0)
+ 269               	.LM17:
+ 270               	.LFBB4:
+ 271 0066 1F92      		push r1
+ 272 0068 0F92      		push r0
+ 273 006a 0FB6      		in r0,__SREG__
+ 274 006c 0F92      		push r0
+ 275 006e 1124      		clr __zero_reg__
+ 276 0070 2F93      		push r18
+ 277 0072 3F93      		push r19
+ 278 0074 4F93      		push r20
+ 279 0076 5F93      		push r21
+ 280 0078 6F93      		push r22
+ 281 007a 7F93      		push r23
+ 282 007c 8F93      		push r24
+ 283 007e 9F93      		push r25
+ 284 0080 AF93      		push r26
+ 285 0082 BF93      		push r27
+ 286 0084 EF93      		push r30
+ 287 0086 FF93      		push r31
+ 288               	/* prologue: Signal */
+ 289               	/* frame size = 0 */
+ 290               	/* stack size = 15 */
+ 291               	.L__stack_usage = 15
+ 293               	.LM18:
+ 294 0088 E091 0000 		lds r30,intFunc
+ 295 008c F091 0000 		lds r31,intFunc+1
+ 296 0090 0995      		icall
+ 297               	/* epilogue start */
+ 298 0092 FF91      		pop r31
+ 299 0094 EF91      		pop r30
+ 300 0096 BF91      		pop r27
+ 301 0098 AF91      		pop r26
+ 302 009a 9F91      		pop r25
+ 303 009c 8F91      		pop r24
+ 304 009e 7F91      		pop r23
+ 305 00a0 6F91      		pop r22
+ 306 00a2 5F91      		pop r21
+ 307 00a4 4F91      		pop r20
+ 308 00a6 3F91      		pop r19
+ 309 00a8 2F91      		pop r18
+ 310 00aa 0F90      		pop r0
+ 311 00ac 0FBE      		out __SREG__,r0
+ 312 00ae 0F90      		pop r0
+ 313 00b0 1F90      		pop r1
+ 314 00b2 1895      		reti
+ 316               	.Lscope4:
+ 318               		.stabd	78,0,0
+ 320               	.global	__vector_2
+ 322               	__vector_2:
+ 323               		.stabd	46,0,0
+ 310:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WInterrupts.c **** IMPLEMENT_ISR(INT1_vect, EXTERNAL_INT_1)
+ 325               	.LM19:
+ 326               	.LFBB5:
+ 327 00b4 1F92      		push r1
+ 328 00b6 0F92      		push r0
+ 329 00b8 0FB6      		in r0,__SREG__
+ 330 00ba 0F92      		push r0
+ 331 00bc 1124      		clr __zero_reg__
+ 332 00be 2F93      		push r18
+ 333 00c0 3F93      		push r19
+ 334 00c2 4F93      		push r20
+ 335 00c4 5F93      		push r21
+ 336 00c6 6F93      		push r22
+ 337 00c8 7F93      		push r23
+ 338 00ca 8F93      		push r24
+ 339 00cc 9F93      		push r25
+ 340 00ce AF93      		push r26
+ 341 00d0 BF93      		push r27
+ 342 00d2 EF93      		push r30
+ 343 00d4 FF93      		push r31
+ 344               	/* prologue: Signal */
+ 345               	/* frame size = 0 */
+ 346               	/* stack size = 15 */
+ 347               	.L__stack_usage = 15
+ 349               	.LM20:
+ 350 00d6 E091 0000 		lds r30,intFunc+2
+ 351 00da F091 0000 		lds r31,intFunc+2+1
+ 352 00de 0995      		icall
+ 353               	/* epilogue start */
+ 354 00e0 FF91      		pop r31
+ 355 00e2 EF91      		pop r30
+ 356 00e4 BF91      		pop r27
+ 357 00e6 AF91      		pop r26
+ 358 00e8 9F91      		pop r25
+ 359 00ea 8F91      		pop r24
+ 360 00ec 7F91      		pop r23
+ 361 00ee 6F91      		pop r22
+ 362 00f0 5F91      		pop r21
+ 363 00f2 4F91      		pop r20
+ 364 00f4 3F91      		pop r19
+ 365 00f6 2F91      		pop r18
+ 366 00f8 0F90      		pop r0
+ 367 00fa 0FBE      		out __SREG__,r0
+ 368 00fc 0F90      		pop r0
+ 369 00fe 1F90      		pop r1
+ 370 0100 1895      		reti
+ 372               	.Lscope5:
+ 374               		.stabd	78,0,0
+ 375               		.data
+ 378               	intFunc:
+ 379 0000 0000      		.word	gs(nothing)
+ 380 0002 0000      		.word	gs(nothing)
+ 396               		.text
+ 398               	.Letext0:
+ 399               		.ident	"GCC: (GNU) 5.4.0"
+ 400               	.global __do_copy_data
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 WInterrupts.c
+     /tmp/ccinSEFV.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccinSEFV.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccinSEFV.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccinSEFV.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccinSEFV.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccinSEFV.s:134    .text:0000000000000000 nothing
+     /tmp/ccinSEFV.s:154    .text:0000000000000002 attachInterrupt
+     /tmp/ccinSEFV.s:378    .data:0000000000000000 intFunc
+     /tmp/ccinSEFV.s:217    .text:0000000000000042 detachInterrupt
+     /tmp/ccinSEFV.s:266    .text:0000000000000066 __vector_1
+     /tmp/ccinSEFV.s:322    .text:00000000000000b4 __vector_2
+
+UNDEFINED SYMBOLS
+__do_copy_data

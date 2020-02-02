@@ -1,0 +1,87 @@
+   1               		.file	"main.cpp"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 132               		.weak	atexit
+ 134               	atexit:
+ 135               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** /*
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   main.cpp - Main loop for Arduino sketches
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   Copyright (c) 2005-2013 Arduino Team.  All right reserved.
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** 
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   This library is free software; you can redistribute it and/or
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   modify it under the terms of the GNU Lesser General Public
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   License as published by the Free Software Foundation; either
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   version 2.1 of the License, or (at your option) any later version.
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** 
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   This library is distributed in the hope that it will be useful,
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   Lesser General Public License for more details.
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** 
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   You should have received a copy of the GNU Lesser General Public
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   License along with this library; if not, write to the Free Software
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp ****   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** */
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** 
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** #include <Arduino.h>
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** 
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** // Declared weak in Arduino.h to allow user redefinitions.
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** int atexit(void (* /*func*/ )()) { return 0; }
+ 137               	.LM0:
+ 138               	.LFBB1:
+ 139               	/* prologue: function */
+ 140               	/* frame size = 0 */
+ 141               	/* stack size = 0 */
+ 142               	.L__stack_usage = 0
+ 144               	.LM1:
+ 145 0000 80E0      		ldi r24,0
+ 146 0002 90E0      		ldi r25,0
+ 147 0004 0895      		ret
+ 149               	.Lscope1:
+ 151               		.stabd	78,0,0
+ 152               		.weak	initVariant
+ 154               	initVariant:
+ 155               	/* prologue: function */
+ 156               	/* frame size = 0 */
+ 157               	/* stack size = 0 */
+ 158               	.L__stack_usage = 0
+ 159 0006 0895      		ret
+ 162               		.weak	_Z8setupUSBv
+ 164               	_Z8setupUSBv:
+ 165               		.stabd	46,0,0
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** 
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** // Weak empty variant initialization function.
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** // May be redefined by variant files.
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** void initVariant() __attribute__((weak));
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** void initVariant() { }
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** 
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** void setupUSB() __attribute__((weak));
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/main.cpp **** void setupUSB() { }
+ 167               	.LM2:
+ 168               	.LFBB2:
+ 169               	/* prologue: function */
+ 170               	/* frame size = 0 */
+ 171               	/* stack size = 0 */
+ 172               	.L__stack_usage = 0
+ 173 0008 0895      		ret
+ 175               	.Lscope2:
+ 177               		.stabd	78,0,0
+ 193               	.Letext0:
+ 194               		.ident	"GCC: (GNU) 5.4.0"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.cpp
+     /tmp/ccgqHX6I.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccgqHX6I.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccgqHX6I.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccgqHX6I.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccgqHX6I.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccgqHX6I.s:134    .text:0000000000000000 atexit
+     /tmp/ccgqHX6I.s:154    .text:0000000000000006 initVariant
+     /tmp/ccgqHX6I.s:164    .text:0000000000000008 _Z8setupUSBv
+
+NO UNDEFINED SYMBOLS

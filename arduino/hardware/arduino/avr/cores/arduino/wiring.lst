@@ -1,0 +1,803 @@
+   1               		.file	"wiring.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 133               	.global	__vector_16
+ 135               	__vector_16:
+ 136               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** /*
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   wiring.c - Partial implementation of the Wiring API for the ATmega8.
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   Part of Arduino - http://www.arduino.cc/
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   Copyright (c) 2005-2006 David A. Mellis
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   This library is free software; you can redistribute it and/or
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   modify it under the terms of the GNU Lesser General Public
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   License as published by the Free Software Foundation; either
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   version 2.1 of the License, or (at your option) any later version.
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   This library is distributed in the hope that it will be useful,
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   Lesser General Public License for more details.
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   You should have received a copy of the GNU Lesser General
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   Public License along with this library; if not, write to the
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c ****   Boston, MA  02111-1307  USA
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** */
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #include "wiring_private.h"
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** // the prescaler is set so that timer0 ticks every 64 clock cycles, and the
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** // the overflow handler is called every 256 ticks.
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #define MICROSECONDS_PER_TIMER0_OVERFLOW (clockCyclesToMicroseconds(64 * 256))
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** // the whole number of milliseconds per timer0 overflow
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #define MILLIS_INC (MICROSECONDS_PER_TIMER0_OVERFLOW / 1000)
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  32:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** // the fractional number of milliseconds per timer0 overflow. we shift right
+  33:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** // by three to fit these numbers into a byte. (for the clock speeds we care
+  34:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** // about - 8 and 16 MHz - this doesn't lose precision.)
+  35:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #define FRACT_INC ((MICROSECONDS_PER_TIMER0_OVERFLOW % 1000) >> 3)
+  36:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #define FRACT_MAX (1000 >> 3)
+  37:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** volatile unsigned long timer0_overflow_count = 0;
+  39:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** volatile unsigned long timer0_millis = 0;
+  40:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** static unsigned char timer0_fract = 0;
+  41:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  42:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TIM0_OVF_vect)
+  43:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** ISR(TIM0_OVF_vect)
+  44:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #else
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** ISR(TIMER0_OVF_vect)
+  46:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+  47:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** {
+ 138               	.LM0:
+ 139               	.LFBB1:
+ 140 0000 1F92      		push r1
+ 141 0002 0F92      		push r0
+ 142 0004 0FB6      		in r0,__SREG__
+ 143 0006 0F92      		push r0
+ 144 0008 1124      		clr __zero_reg__
+ 145 000a 2F93      		push r18
+ 146 000c 3F93      		push r19
+ 147 000e 8F93      		push r24
+ 148 0010 9F93      		push r25
+ 149 0012 AF93      		push r26
+ 150 0014 BF93      		push r27
+ 151               	/* prologue: Signal */
+ 152               	/* frame size = 0 */
+ 153               	/* stack size = 9 */
+ 154               	.L__stack_usage = 9
+  48:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// copy these to local variables so they can be stored in registers
+  49:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// (volatile variables must be read from memory on every access)
+  50:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	unsigned long m = timer0_millis;
+ 156               	.LM1:
+ 157 0016 8091 0000 		lds r24,timer0_millis
+ 158 001a 9091 0000 		lds r25,timer0_millis+1
+ 159 001e A091 0000 		lds r26,timer0_millis+2
+ 160 0022 B091 0000 		lds r27,timer0_millis+3
+  51:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	unsigned char f = timer0_fract;
+ 162               	.LM2:
+ 163 0026 3091 0000 		lds r19,timer0_fract
+  52:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	m += MILLIS_INC;
+  54:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	f += FRACT_INC;
+ 165               	.LM3:
+ 166 002a 23E0      		ldi r18,lo8(3)
+ 167 002c 230F      		add r18,r19
+  55:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (f >= FRACT_MAX) {
+ 169               	.LM4:
+ 170 002e 2D37      		cpi r18,lo8(125)
+ 171 0030 00F4      		brsh .L2
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	f += FRACT_INC;
+ 173               	.LM5:
+ 174 0032 0196      		adiw r24,1
+ 175 0034 A11D      		adc r26,__zero_reg__
+ 176 0036 B11D      		adc r27,__zero_reg__
+ 177 0038 00C0      		rjmp .L3
+ 178               	.L2:
+  56:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		f -= FRACT_MAX;
+ 180               	.LM6:
+ 181 003a 26E8      		ldi r18,lo8(-122)
+ 182 003c 230F      		add r18,r19
+  57:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		m += 1;
+ 184               	.LM7:
+ 185 003e 0296      		adiw r24,2
+ 186 0040 A11D      		adc r26,__zero_reg__
+ 187 0042 B11D      		adc r27,__zero_reg__
+ 188               	.L3:
+  58:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	}
+  59:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  60:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	timer0_fract = f;
+ 190               	.LM8:
+ 191 0044 2093 0000 		sts timer0_fract,r18
+  61:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	timer0_millis = m;
+ 193               	.LM9:
+ 194 0048 8093 0000 		sts timer0_millis,r24
+ 195 004c 9093 0000 		sts timer0_millis+1,r25
+ 196 0050 A093 0000 		sts timer0_millis+2,r26
+ 197 0054 B093 0000 		sts timer0_millis+3,r27
+  62:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	timer0_overflow_count++;
+ 199               	.LM10:
+ 200 0058 8091 0000 		lds r24,timer0_overflow_count
+ 201 005c 9091 0000 		lds r25,timer0_overflow_count+1
+ 202 0060 A091 0000 		lds r26,timer0_overflow_count+2
+ 203 0064 B091 0000 		lds r27,timer0_overflow_count+3
+ 204 0068 0196      		adiw r24,1
+ 205 006a A11D      		adc r26,__zero_reg__
+ 206 006c B11D      		adc r27,__zero_reg__
+ 207 006e 8093 0000 		sts timer0_overflow_count,r24
+ 208 0072 9093 0000 		sts timer0_overflow_count+1,r25
+ 209 0076 A093 0000 		sts timer0_overflow_count+2,r26
+ 210 007a B093 0000 		sts timer0_overflow_count+3,r27
+ 211               	/* epilogue start */
+  63:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** }
+ 213               	.LM11:
+ 214 007e BF91      		pop r27
+ 215 0080 AF91      		pop r26
+ 216 0082 9F91      		pop r25
+ 217 0084 8F91      		pop r24
+ 218 0086 3F91      		pop r19
+ 219 0088 2F91      		pop r18
+ 220 008a 0F90      		pop r0
+ 221 008c 0FBE      		out __SREG__,r0
+ 222 008e 0F90      		pop r0
+ 223 0090 1F90      		pop r1
+ 224 0092 1895      		reti
+ 226               	.Lscope1:
+ 228               		.stabd	78,0,0
+ 230               	.global	millis
+ 232               	millis:
+ 233               		.stabd	46,0,0
+  64:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  65:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** unsigned long millis()
+  66:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** {
+ 235               	.LM12:
+ 236               	.LFBB2:
+ 237               	/* prologue: function */
+ 238               	/* frame size = 0 */
+ 239               	/* stack size = 0 */
+ 240               	.L__stack_usage = 0
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	unsigned long m;
+  68:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	uint8_t oldSREG = SREG;
+ 242               	.LM13:
+ 243 0094 2FB7      		in r18,__SREG__
+  69:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  70:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// disable interrupts while we read timer0_millis or we might get an
+  71:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// inconsistent value (e.g. in the middle of a write to timer0_millis)
+  72:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	cli();
+ 245               	.LM14:
+ 246               	/* #APP */
+ 247               	 ;  72 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino
+ 248 0096 F894      		cli
+ 249               	 ;  0 "" 2
+  73:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	m = timer0_millis;
+ 251               	.LM15:
+ 252               	/* #NOAPP */
+ 253 0098 6091 0000 		lds r22,timer0_millis
+ 254 009c 7091 0000 		lds r23,timer0_millis+1
+ 255 00a0 8091 0000 		lds r24,timer0_millis+2
+ 256 00a4 9091 0000 		lds r25,timer0_millis+3
+  74:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	SREG = oldSREG;
+ 258               	.LM16:
+ 259 00a8 2FBF      		out __SREG__,r18
+  75:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  76:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	return m;
+  77:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** }
+ 261               	.LM17:
+ 262 00aa 0895      		ret
+ 268               	.Lscope2:
+ 270               		.stabd	78,0,0
+ 272               	.global	micros
+ 274               	micros:
+ 275               		.stabd	46,0,0
+  78:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  79:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** unsigned long micros() {
+ 277               	.LM18:
+ 278               	.LFBB3:
+ 279               	/* prologue: function */
+ 280               	/* frame size = 0 */
+ 281               	/* stack size = 0 */
+ 282               	.L__stack_usage = 0
+  80:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	unsigned long m;
+  81:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	uint8_t oldSREG = SREG, t;
+ 284               	.LM19:
+ 285 00ac 3FB7      		in r19,__SREG__
+  82:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	
+  83:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	cli();
+ 287               	.LM20:
+ 288               	/* #APP */
+ 289               	 ;  83 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino
+ 290 00ae F894      		cli
+ 291               	 ;  0 "" 2
+  84:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	m = timer0_overflow_count;
+ 293               	.LM21:
+ 294               	/* #NOAPP */
+ 295 00b0 8091 0000 		lds r24,timer0_overflow_count
+ 296 00b4 9091 0000 		lds r25,timer0_overflow_count+1
+ 297 00b8 A091 0000 		lds r26,timer0_overflow_count+2
+ 298 00bc B091 0000 		lds r27,timer0_overflow_count+3
+  85:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCNT0)
+  86:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	t = TCNT0;
+ 300               	.LM22:
+ 301 00c0 26B5      		in r18,0x26
+  87:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TCNT0L)
+  88:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	t = TCNT0L;
+  89:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #else
+  90:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#error TIMER 0 not defined
+  91:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+  92:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+  93:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #ifdef TIFR0
+  94:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if ((TIFR0 & _BV(TOV0)) && (t < 255))
+ 303               	.LM23:
+ 304 00c2 A89B      		sbis 0x15,0
+ 305 00c4 00C0      		rjmp .L7
+ 307               	.LM24:
+ 308 00c6 2F3F      		cpi r18,lo8(-1)
+ 309 00c8 01F0      		breq .L7
+  95:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		m++;
+ 311               	.LM25:
+ 312 00ca 0196      		adiw r24,1
+ 313 00cc A11D      		adc r26,__zero_reg__
+ 314 00ce B11D      		adc r27,__zero_reg__
+ 315               	.L7:
+  96:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #else
+  97:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if ((TIFR & _BV(TOV0)) && (t < 255))
+  98:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		m++;
+  99:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 100:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 101:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	SREG = oldSREG;
+ 317               	.LM26:
+ 318 00d0 3FBF      		out __SREG__,r19
+ 102:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	
+ 103:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
+ 320               	.LM27:
+ 321 00d2 BA2F      		mov r27,r26
+ 322 00d4 A92F      		mov r26,r25
+ 323 00d6 982F      		mov r25,r24
+ 324 00d8 8827      		clr r24
+ 325 00da 820F      		add r24,r18
+ 326 00dc 911D      		adc r25,__zero_reg__
+ 327 00de A11D      		adc r26,__zero_reg__
+ 328 00e0 B11D      		adc r27,__zero_reg__
+ 329 00e2 BC01      		movw r22,r24
+ 330 00e4 CD01      		movw r24,r26
+ 331 00e6 42E0      		ldi r20,2
+ 332               		1:
+ 333 00e8 660F      		lsl r22
+ 334 00ea 771F      		rol r23
+ 335 00ec 881F      		rol r24
+ 336 00ee 991F      		rol r25
+ 337 00f0 4A95      		dec r20
+ 338 00f2 01F4      		brne 1b
+ 104:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** }
+ 340               	.LM28:
+ 341 00f4 0895      		ret
+ 348               	.Lscope3:
+ 350               		.stabd	78,0,0
+ 353               	.global	delay
+ 355               	delay:
+ 356               		.stabd	46,0,0
+ 105:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 106:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** void delay(unsigned long ms)
+ 107:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** {
+ 358               	.LM29:
+ 359               	.LFBB4:
+ 360 00f6 8F92      		push r8
+ 361 00f8 9F92      		push r9
+ 362 00fa AF92      		push r10
+ 363 00fc BF92      		push r11
+ 364 00fe CF92      		push r12
+ 365 0100 DF92      		push r13
+ 366 0102 EF92      		push r14
+ 367 0104 FF92      		push r15
+ 368               	/* prologue: function */
+ 369               	/* frame size = 0 */
+ 370               	/* stack size = 8 */
+ 371               	.L__stack_usage = 8
+ 372 0106 6B01      		movw r12,r22
+ 373 0108 7C01      		movw r14,r24
+ 108:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	uint32_t start = micros();
+ 375               	.LM30:
+ 376 010a 0E94 0000 		call micros
+ 377 010e 4B01      		movw r8,r22
+ 378 0110 5C01      		movw r10,r24
+ 379               	.L15:
+ 109:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 110:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	while (ms > 0) {
+ 381               	.LM31:
+ 382 0112 C114      		cp r12,__zero_reg__
+ 383 0114 D104      		cpc r13,__zero_reg__
+ 384 0116 E104      		cpc r14,__zero_reg__
+ 385 0118 F104      		cpc r15,__zero_reg__
+ 386 011a 01F0      		breq .L23
+ 111:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		yield();
+ 388               	.LM32:
+ 389 011c 0E94 0000 		call yield
+ 390               	.L16:
+ 112:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		while ( ms > 0 && (micros() - start) >= 1000) {
+ 392               	.LM33:
+ 393 0120 0E94 0000 		call micros
+ 394 0124 DC01      		movw r26,r24
+ 395 0126 CB01      		movw r24,r22
+ 396 0128 8819      		sub r24,r8
+ 397 012a 9909      		sbc r25,r9
+ 398 012c AA09      		sbc r26,r10
+ 399 012e BB09      		sbc r27,r11
+ 400 0130 883E      		cpi r24,-24
+ 401 0132 9340      		sbci r25,3
+ 402 0134 A105      		cpc r26,__zero_reg__
+ 403 0136 B105      		cpc r27,__zero_reg__
+ 404 0138 00F0      		brlo .L15
+ 113:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 			ms--;
+ 406               	.LM34:
+ 407 013a 21E0      		ldi r18,1
+ 408 013c C21A      		sub r12,r18
+ 409 013e D108      		sbc r13,__zero_reg__
+ 410 0140 E108      		sbc r14,__zero_reg__
+ 411 0142 F108      		sbc r15,__zero_reg__
+ 114:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 			start += 1000;
+ 413               	.LM35:
+ 414 0144 88EE      		ldi r24,-24
+ 415 0146 880E      		add r8,r24
+ 416 0148 83E0      		ldi r24,3
+ 417 014a 981E      		adc r9,r24
+ 418 014c A11C      		adc r10,__zero_reg__
+ 419 014e B11C      		adc r11,__zero_reg__
+ 112:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		while ( ms > 0 && (micros() - start) >= 1000) {
+ 421               	.LM36:
+ 422 0150 C114      		cp r12,__zero_reg__
+ 423 0152 D104      		cpc r13,__zero_reg__
+ 424 0154 E104      		cpc r14,__zero_reg__
+ 425 0156 F104      		cpc r15,__zero_reg__
+ 426 0158 01F4      		brne .L16
+ 427 015a 00C0      		rjmp .L15
+ 428               	.L23:
+ 429               	/* epilogue start */
+ 115:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		}
+ 116:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	}
+ 117:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** }
+ 431               	.LM37:
+ 432 015c FF90      		pop r15
+ 433 015e EF90      		pop r14
+ 434 0160 DF90      		pop r13
+ 435 0162 CF90      		pop r12
+ 436 0164 BF90      		pop r11
+ 437 0166 AF90      		pop r10
+ 438 0168 9F90      		pop r9
+ 439 016a 8F90      		pop r8
+ 440 016c 0895      		ret
+ 445               	.Lscope4:
+ 447               		.stabd	78,0,0
+ 450               	.global	delayMicroseconds
+ 452               	delayMicroseconds:
+ 453               		.stabd	46,0,0
+ 118:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 119:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** /* Delay for the given number of microseconds.  Assumes a 1, 8, 12, 16, 20 or 24 MHz clock. */
+ 120:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** void delayMicroseconds(unsigned int us)
+ 121:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** {
+ 455               	.LM38:
+ 456               	.LFBB5:
+ 457               	/* prologue: function */
+ 458               	/* frame size = 0 */
+ 459               	/* stack size = 0 */
+ 460               	.L__stack_usage = 0
+ 122:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// call = 4 cycles + 2 to 4 cycles to init us(2 for constant delay, 4 for variable)
+ 123:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 124:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// calling avrlib's delay_us() function with low values (e.g. 1 or
+ 125:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// 2 microseconds) gives delays longer than desired.
+ 126:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	//delay_us(us);
+ 127:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if F_CPU >= 24000000L
+ 128:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for the 24 MHz clock for the aventurous ones, trying to overclock
+ 129:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 130:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// zero delay fix
+ 131:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (!us) return; //  = 3 cycles, (4 when true)
+ 132:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 133:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the following loop takes a 1/6 of a microsecond (4 cycles)
+ 134:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// per iteration, so execute it six times for each microsecond of
+ 135:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// delay requested.
+ 136:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us *= 6; // x6 us, = 7 cycles
+ 137:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 138:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// account for the time taken in the preceeding commands.
+ 139:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// we just burned 22 (24) cycles above, remove 5, (5*4=20)
+ 140:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// us is at least 6 so we can substract 5
+ 141:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us -= 5; //=2 cycles
+ 142:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 143:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif F_CPU >= 20000000L
+ 144:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for the 20 MHz clock on rare Arduino boards
+ 145:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 146:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for a one-microsecond delay, simply return.  the overhead
+ 147:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// of the function call takes 18 (20) cycles, which is 1us
+ 148:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	__asm__ __volatile__ (
+ 149:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		"nop" "\n\t"
+ 150:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		"nop" "\n\t"
+ 151:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		"nop" "\n\t"
+ 152:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		"nop"); //just waiting 4 cycles
+ 153:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (us <= 1) return; //  = 3 cycles, (4 when true)
+ 154:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 155:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the following loop takes a 1/5 of a microsecond (4 cycles)
+ 156:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// per iteration, so execute it five times for each microsecond of
+ 157:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// delay requested.
+ 158:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us = (us << 2) + us; // x5 us, = 7 cycles
+ 159:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 160:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// account for the time taken in the preceeding commands.
+ 161:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// we just burned 26 (28) cycles above, remove 7, (7*4=28)
+ 162:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// us is at least 10 so we can substract 7
+ 163:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us -= 7; // 2 cycles
+ 164:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 165:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif F_CPU >= 16000000L
+ 166:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for the 16 MHz clock on most Arduino boards
+ 167:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 168:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for a one-microsecond delay, simply return.  the overhead
+ 169:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// of the function call takes 14 (16) cycles, which is 1us
+ 170:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (us <= 1) return; //  = 3 cycles, (4 when true)
+ 462               	.LM39:
+ 463 016e 8230      		cpi r24,2
+ 464 0170 9105      		cpc r25,__zero_reg__
+ 465 0172 00F0      		brlo .L24
+ 171:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 172:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the following loop takes 1/4 of a microsecond (4 cycles)
+ 173:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// per iteration, so execute it four times for each microsecond of
+ 174:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// delay requested.
+ 175:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us <<= 2; // x4 us, = 4 cycles
+ 467               	.LM40:
+ 468 0174 880F      		lsl r24
+ 469 0176 991F      		rol r25
+ 470 0178 880F      		lsl r24
+ 471 017a 991F      		rol r25
+ 176:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 177:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// account for the time taken in the preceeding commands.
+ 178:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// we just burned 19 (21) cycles above, remove 5, (5*4=20)
+ 179:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// us is at least 8 so we can substract 5
+ 180:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us -= 5; // = 2 cycles,
+ 473               	.LM41:
+ 474 017c 0597      		sbiw r24,5
+ 181:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 182:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif F_CPU >= 12000000L
+ 183:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for the 12 MHz clock if somebody is working with USB
+ 184:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 185:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for a 1 microsecond delay, simply return.  the overhead
+ 186:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// of the function call takes 14 (16) cycles, which is 1.5us
+ 187:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (us <= 1) return; //  = 3 cycles, (4 when true)
+ 188:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 189:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the following loop takes 1/3 of a microsecond (4 cycles)
+ 190:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// per iteration, so execute it three times for each microsecond of
+ 191:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// delay requested.
+ 192:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us = (us << 1) + us; // x3 us, = 5 cycles
+ 193:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 194:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// account for the time taken in the preceeding commands.
+ 195:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// we just burned 20 (22) cycles above, remove 5, (5*4=20)
+ 196:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// us is at least 6 so we can substract 5
+ 197:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us -= 5; //2 cycles
+ 198:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 199:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif F_CPU >= 8000000L
+ 200:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for the 8 MHz internal clock
+ 201:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 202:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for a 1 and 2 microsecond delay, simply return.  the overhead
+ 203:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// of the function call takes 14 (16) cycles, which is 2us
+ 204:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (us <= 2) return; //  = 3 cycles, (4 when true)
+ 205:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 206:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the following loop takes 1/2 of a microsecond (4 cycles)
+ 207:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// per iteration, so execute it twice for each microsecond of
+ 208:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// delay requested.
+ 209:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us <<= 1; //x2 us, = 2 cycles
+ 210:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 211:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// account for the time taken in the preceeding commands.
+ 212:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// we just burned 17 (19) cycles above, remove 4, (4*4=16)
+ 213:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// us is at least 6 so we can substract 4
+ 214:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us -= 4; // = 2 cycles
+ 215:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 216:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #else
+ 217:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// for the 1 MHz internal clock (default settings for common Atmega microcontrollers)
+ 218:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 219:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the overhead of the function calls is 14 (16) cycles
+ 220:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (us <= 16) return; //= 3 cycles, (4 when true)
+ 221:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	if (us <= 25) return; //= 3 cycles, (4 when true), (must be at least 25 if we want to substract 22
+ 222:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 223:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// compensate for the time taken by the preceeding and next commands (about 22 cycles)
+ 224:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us -= 22; // = 2 cycles
+ 225:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the following loop takes 4 microseconds (4 cycles)
+ 226:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// per iteration, so execute it us/4 times
+ 227:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// us is at least 4, divided by 4 gives us 1 (no zero delay bug)
+ 228:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	us >>= 2; // us div 4, = 4 cycles
+ 229:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	
+ 230:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 231:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 232:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 233:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// busy wait
+ 234:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	__asm__ __volatile__ (
+ 476               	.LM42:
+ 477               	/* #APP */
+ 478               	 ;  234 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduin
+ 479 017e 0197      		1: sbiw r24,1
+ 480 0180 01F4      		brne 1b
+ 481               	 ;  0 "" 2
+ 482               	/* #NOAPP */
+ 483               	.L24:
+ 484 0182 0895      		ret
+ 486               	.Lscope5:
+ 488               		.stabd	78,0,0
+ 490               	.global	init
+ 492               	init:
+ 493               		.stabd	46,0,0
+ 235:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		"1: sbiw %0,1" "\n\t" // 2 cycles
+ 236:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+ 237:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	);
+ 238:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// return = 4 cycles
+ 239:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** }
+ 240:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 241:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** void init()
+ 242:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** {
+ 495               	.LM43:
+ 496               	.LFBB6:
+ 497               	/* prologue: function */
+ 498               	/* frame size = 0 */
+ 499               	/* stack size = 0 */
+ 500               	.L__stack_usage = 0
+ 243:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// this needs to be called before setup() or some functions won't
+ 244:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// work there
+ 245:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sei();
+ 502               	.LM44:
+ 503               	/* #APP */
+ 504               	 ;  245 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduin
+ 505 0184 7894      		sei
+ 506               	 ;  0 "" 2
+ 246:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	
+ 247:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// on the ATmega168, timer 0 is also used for fast hardware pwm
+ 248:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// (using phase-correct PWM would mean that timer 0 overflowed half as often
+ 249:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// resulting in different millis() behavior on the ATmega8 and ATmega168)
+ 250:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR0A) && defined(WGM01)
+ 251:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0A, WGM01);
+ 508               	.LM45:
+ 509               	/* #NOAPP */
+ 510 0186 84B5      		in r24,0x24
+ 511 0188 8260      		ori r24,lo8(2)
+ 512 018a 84BD      		out 0x24,r24
+ 252:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0A, WGM00);
+ 514               	.LM46:
+ 515 018c 84B5      		in r24,0x24
+ 516 018e 8160      		ori r24,lo8(1)
+ 517 0190 84BD      		out 0x24,r24
+ 253:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 254:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 255:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// set timer 0 prescale factor to 64
+ 256:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(__AVR_ATmega128__)
+ 257:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// CPU specific: different values for the ATmega128
+ 258:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0, CS02);
+ 259:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TCCR0) && defined(CS01) && defined(CS00)
+ 260:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// this combination is for the standard atmega8
+ 261:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0, CS01);
+ 262:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0, CS00);
+ 263:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TCCR0B) && defined(CS01) && defined(CS00)
+ 264:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// this combination is for the standard 168/328/1280/2560
+ 265:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0B, CS01);
+ 519               	.LM47:
+ 520 0192 85B5      		in r24,0x25
+ 521 0194 8260      		ori r24,lo8(2)
+ 522 0196 85BD      		out 0x25,r24
+ 266:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0B, CS00);
+ 524               	.LM48:
+ 525 0198 85B5      		in r24,0x25
+ 526 019a 8160      		ori r24,lo8(1)
+ 527 019c 85BD      		out 0x25,r24
+ 267:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TCCR0A) && defined(CS01) && defined(CS00)
+ 268:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// this combination is for the __AVR_ATmega645__ series
+ 269:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0A, CS01);
+ 270:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR0A, CS00);
+ 271:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #else
+ 272:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#error Timer 0 prescale factor 64 not set correctly
+ 273:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 274:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 275:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// enable timer 0 overflow interrupt
+ 276:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TIMSK) && defined(TOIE0)
+ 277:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TIMSK, TOIE0);
+ 278:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TIMSK0) && defined(TOIE0)
+ 279:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TIMSK0, TOIE0);
+ 529               	.LM49:
+ 530 019e EEE6      		ldi r30,lo8(110)
+ 531 01a0 F0E0      		ldi r31,0
+ 532 01a2 8081      		ld r24,Z
+ 533 01a4 8160      		ori r24,lo8(1)
+ 534 01a6 8083      		st Z,r24
+ 280:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #else
+ 281:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#error	Timer 0 overflow interrupt not set correctly
+ 282:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 283:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 284:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// timers 1 and 2 are used for phase-correct hardware pwm
+ 285:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// this is better for motors as it ensures an even waveform
+ 286:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// note, however, that fast pwm mode can achieve a frequency of up
+ 287:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
+ 288:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 289:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR1B) && defined(CS11) && defined(CS10)
+ 290:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	TCCR1B = 0;
+ 536               	.LM50:
+ 537 01a8 E1E8      		ldi r30,lo8(-127)
+ 538 01aa F0E0      		ldi r31,0
+ 539 01ac 1082      		st Z,__zero_reg__
+ 291:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 292:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// set timer 1 prescale factor to 64
+ 293:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR1B, CS11);
+ 541               	.LM51:
+ 542 01ae 8081      		ld r24,Z
+ 543 01b0 8260      		ori r24,lo8(2)
+ 544 01b2 8083      		st Z,r24
+ 294:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if F_CPU >= 8000000L
+ 295:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR1B, CS10);
+ 546               	.LM52:
+ 547 01b4 8081      		ld r24,Z
+ 548 01b6 8160      		ori r24,lo8(1)
+ 549 01b8 8083      		st Z,r24
+ 296:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 297:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TCCR1) && defined(CS11) && defined(CS10)
+ 298:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR1, CS11);
+ 299:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if F_CPU >= 8000000L
+ 300:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR1, CS10);
+ 301:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 302:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 303:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// put timer 1 in 8-bit phase correct pwm mode
+ 304:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR1A) && defined(WGM10)
+ 305:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR1A, WGM10);
+ 551               	.LM53:
+ 552 01ba E0E8      		ldi r30,lo8(-128)
+ 553 01bc F0E0      		ldi r31,0
+ 554 01be 8081      		ld r24,Z
+ 555 01c0 8160      		ori r24,lo8(1)
+ 556 01c2 8083      		st Z,r24
+ 306:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 307:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 308:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// set timer 2 prescale factor to 64
+ 309:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR2) && defined(CS22)
+ 310:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR2, CS22);
+ 311:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TCCR2B) && defined(CS22)
+ 312:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR2B, CS22);
+ 558               	.LM54:
+ 559 01c4 E1EB      		ldi r30,lo8(-79)
+ 560 01c6 F0E0      		ldi r31,0
+ 561 01c8 8081      		ld r24,Z
+ 562 01ca 8460      		ori r24,lo8(4)
+ 563 01cc 8083      		st Z,r24
+ 313:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** //#else
+ 314:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// Timer 2 not finished (may not be present on this CPU)
+ 315:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 316:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 317:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// configure timer 2 for phase correct pwm (8-bit)
+ 318:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR2) && defined(WGM20)
+ 319:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR2, WGM20);
+ 320:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(TCCR2A) && defined(WGM20)
+ 321:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR2A, WGM20);
+ 565               	.LM55:
+ 566 01ce E0EB      		ldi r30,lo8(-80)
+ 567 01d0 F0E0      		ldi r31,0
+ 568 01d2 8081      		ld r24,Z
+ 569 01d4 8160      		ori r24,lo8(1)
+ 570 01d6 8083      		st Z,r24
+ 322:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** //#else
+ 323:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// Timer 2 not finished (may not be present on this CPU)
+ 324:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 325:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 326:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR3B) && defined(CS31) && defined(WGM30)
+ 327:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR3B, CS31);		// set timer 3 prescale factor to 64
+ 328:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR3B, CS30);
+ 329:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR3A, WGM30);		// put timer 3 in 8-bit phase correct pwm mode
+ 330:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 331:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 332:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR4A) && defined(TCCR4B) && defined(TCCR4D) /* beginning of timer4 block for 32U4 and
+ 333:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4B, CS42);		// set timer4 prescale factor to 64
+ 334:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4B, CS41);
+ 335:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4B, CS40);
+ 336:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4D, WGM40);		// put timer 4 in phase- and frequency-correct PWM mode	
+ 337:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4A, PWM4A);		// enable PWM mode for comparator OCR4A
+ 338:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4C, PWM4D);		// enable PWM mode for comparator OCR4D
+ 339:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #else /* beginning of timer4 block for ATMEGA1280 and ATMEGA2560 */
+ 340:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR4B) && defined(CS41) && defined(WGM40)
+ 341:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4B, CS41);		// set timer 4 prescale factor to 64
+ 342:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4B, CS40);
+ 343:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR4A, WGM40);		// put timer 4 in 8-bit phase correct pwm mode
+ 344:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 345:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif /* end timer4 block for ATMEGA1280/2560 and similar */	
+ 346:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 347:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(TCCR5B) && defined(CS51) && defined(WGM50)
+ 348:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR5B, CS51);		// set timer 5 prescale factor to 64
+ 349:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR5B, CS50);
+ 350:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(TCCR5A, WGM50);		// put timer 5 in 8-bit phase correct pwm mode
+ 351:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 352:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 353:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(ADCSRA)
+ 354:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// set a2d prescaler so we are inside the desired 50-200 KHz range.
+ 355:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
+ 356:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS2);
+ 572               	.LM56:
+ 573 01d8 EAE7      		ldi r30,lo8(122)
+ 574 01da F0E0      		ldi r31,0
+ 575 01dc 8081      		ld r24,Z
+ 576 01de 8460      		ori r24,lo8(4)
+ 577 01e0 8083      		st Z,r24
+ 357:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS1);
+ 579               	.LM57:
+ 580 01e2 8081      		ld r24,Z
+ 581 01e4 8260      		ori r24,lo8(2)
+ 582 01e6 8083      		st Z,r24
+ 358:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS0);
+ 584               	.LM58:
+ 585 01e8 8081      		ld r24,Z
+ 586 01ea 8160      		ori r24,lo8(1)
+ 587 01ec 8083      		st Z,r24
+ 359:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#elif F_CPU >= 8000000 // 8 MHz / 64 = 125 KHz
+ 360:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS2);
+ 361:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS1);
+ 362:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		cbi(ADCSRA, ADPS0);
+ 363:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#elif F_CPU >= 4000000 // 4 MHz / 32 = 125 KHz
+ 364:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS2);
+ 365:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		cbi(ADCSRA, ADPS1);
+ 366:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS0);
+ 367:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#elif F_CPU >= 2000000 // 2 MHz / 16 = 125 KHz
+ 368:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS2);
+ 369:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		cbi(ADCSRA, ADPS1);
+ 370:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		cbi(ADCSRA, ADPS0);
+ 371:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#elif F_CPU >= 1000000 // 1 MHz / 8 = 125 KHz
+ 372:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		cbi(ADCSRA, ADPS2);
+ 373:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS1);
+ 374:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS0);
+ 375:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#else // 128 kHz / 2 = 64 KHz -> This is the closest you can get, the prescaler is 2
+ 376:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		cbi(ADCSRA, ADPS2);
+ 377:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		cbi(ADCSRA, ADPS1);
+ 378:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 		sbi(ADCSRA, ADPS0);
+ 379:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	#endif
+ 380:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// enable a2d conversions
+ 381:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	sbi(ADCSRA, ADEN);
+ 589               	.LM59:
+ 590 01ee 8081      		ld r24,Z
+ 591 01f0 8068      		ori r24,lo8(-128)
+ 592 01f2 8083      		st Z,r24
+ 382:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #endif
+ 383:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 
+ 384:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// the bootloader connects pins 0 and 1 to the USART; disconnect them
+ 385:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// here so they can be used as normal digital i/o; they will be
+ 386:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	// reconnected in Serial.begin()
+ 387:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #if defined(UCSRB)
+ 388:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	UCSRB = 0;
+ 389:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** #elif defined(UCSR0B)
+ 390:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring.c **** 	UCSR0B = 0;
+ 594               	.LM60:
+ 595 01f4 1092 C100 		sts 193,__zero_reg__
+ 596 01f8 0895      		ret
+ 598               	.Lscope6:
+ 600               		.stabd	78,0,0
+ 601               		.local	timer0_fract
+ 602               		.comm	timer0_fract,1,1
+ 603               	.global	timer0_millis
+ 604               		.section .bss
+ 607               	timer0_millis:
+ 608 0000 0000 0000 		.zero	4
+ 609               	.global	timer0_overflow_count
+ 612               	timer0_overflow_count:
+ 613 0004 0000 0000 		.zero	4
+ 631               		.text
+ 633               	.Letext0:
+ 634               		.ident	"GCC: (GNU) 5.4.0"
+ 635               	.global __do_clear_bss
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 wiring.c
+     /tmp/ccTQAyVS.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccTQAyVS.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccTQAyVS.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccTQAyVS.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccTQAyVS.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccTQAyVS.s:135    .text:0000000000000000 __vector_16
+     /tmp/ccTQAyVS.s:607    .bss:0000000000000000 timer0_millis
+                             .bss:0000000000000008 timer0_fract
+     /tmp/ccTQAyVS.s:612    .bss:0000000000000004 timer0_overflow_count
+     /tmp/ccTQAyVS.s:232    .text:0000000000000094 millis
+     /tmp/ccTQAyVS.s:274    .text:00000000000000ac micros
+     /tmp/ccTQAyVS.s:355    .text:00000000000000f6 delay
+     /tmp/ccTQAyVS.s:452    .text:000000000000016e delayMicroseconds
+     /tmp/ccTQAyVS.s:492    .text:0000000000000184 init
+
+UNDEFINED SYMBOLS
+yield
+__do_clear_bss

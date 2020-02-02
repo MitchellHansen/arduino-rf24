@@ -1,0 +1,1056 @@
+   1               		.file	"HardwareSerial.cpp"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 135               	.global	_ZN14HardwareSerial9availableEv
+ 137               	_ZN14HardwareSerial9availableEv:
+ 138               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** /*
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   HardwareSerial.cpp - Hardware serial library for Wiring
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   This library is free software; you can redistribute it and/or
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   modify it under the terms of the GNU Lesser General Public
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   License as published by the Free Software Foundation; either
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   version 2.1 of the License, or (at your option) any later version.
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   This library is distributed in the hope that it will be useful,
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   Lesser General Public License for more details.
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   You should have received a copy of the GNU Lesser General Public
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   License along with this library; if not, write to the Free Software
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   Modified 23 November 2006 by David A. Mellis
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   Modified 28 September 2010 by Mark Sproul
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   Modified 14 August 2012 by Alarus
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   Modified 3 December 2013 by Matthijs Kooijman
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** */
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include <stdlib.h>
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include <stdio.h>
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include <string.h>
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include <inttypes.h>
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include <util/atomic.h>
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include "Arduino.h"
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  32:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include "HardwareSerial.h"
+  33:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #include "HardwareSerial_private.h"
+  34:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  35:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // this next line disables the entire HardwareSerial.cpp, 
+  36:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // this is so I can support Attiny series and any other chip without a uart
+  37:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL0) || defined(HAVE_HWSERIAL1) || defined(HAVE_HWSERIAL2) || defined(HAVE_H
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  39:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // SerialEvent functions are weak, so when the user doesn't define them,
+  40:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // the linker just sets their address to 0 (which is checked below).
+  41:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // The Serialx_available is just a wrapper around Serialx.available(),
+  42:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // but we can refer to it weakly so we don't pull in the entire
+  43:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // HardwareSerial instance if the user doesn't also refer to it.
+  44:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL0)
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   void serialEvent() __attribute__((weak));
+  46:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   bool Serial0_available() __attribute__((weak));
+  47:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  48:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  49:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL1)
+  50:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   void serialEvent1() __attribute__((weak));
+  51:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   bool Serial1_available() __attribute__((weak));
+  52:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  54:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL2)
+  55:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   void serialEvent2() __attribute__((weak));
+  56:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   bool Serial2_available() __attribute__((weak));
+  57:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  58:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  59:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL3)
+  60:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   void serialEvent3() __attribute__((weak));
+  61:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   bool Serial3_available() __attribute__((weak));
+  62:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  63:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  64:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** void serialEventRun(void)
+  65:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+  66:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL0)
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (Serial0_available && serialEvent && Serial0_available()) serialEvent();
+  68:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  69:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL1)
+  70:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (Serial1_available && serialEvent1 && Serial1_available()) serialEvent1();
+  71:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  72:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL2)
+  73:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (Serial2_available && serialEvent2 && Serial2_available()) serialEvent2();
+  74:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  75:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL3)
+  76:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (Serial3_available && serialEvent3 && Serial3_available()) serialEvent3();
+  77:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  78:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+  79:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  80:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // macro to guard critical sections when needed for large TX buffer sizes
+  81:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if (SERIAL_TX_BUFFER_SIZE>256)
+  82:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #define TX_BUFFER_ATOMIC ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+  83:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #else
+  84:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #define TX_BUFFER_ATOMIC
+  85:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+  86:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  87:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // Actual interrupt handlers //////////////////////////////////////////////////////////////
+  88:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  89:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** void HardwareSerial::_tx_udr_empty_irq(void)
+  90:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+  91:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // If interrupts are enabled, there must be more data in the output
+  92:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // buffer. Send the next byte
+  93:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   unsigned char c = _tx_buffer[_tx_buffer_tail];
+  94:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_TX_BUFFER_SIZE;
+  95:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  96:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_udr = c;
+  97:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+  98:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // clear the TXC bit -- "can be cleared by writing a one to its bit
+  99:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // location". This makes sure flush() won't return until the bytes
+ 100:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // actually got written. Other r/w bits are preserved, and zeroes
+ 101:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // written to the rest.
+ 102:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 103:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #ifdef MPCM0
+ 104:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << MPCM0))) | (1 << TXC0);
+ 105:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #else
+ 106:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << TXC0)));
+ 107:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+ 108:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 109:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (_tx_buffer_head == _tx_buffer_tail) {
+ 110:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // Buffer empty, so disable interrupts
+ 111:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     cbi(*_ucsrb, UDRIE0);
+ 112:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 113:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 114:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 115:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** // Public Methods //////////////////////////////////////////////////////////////
+ 116:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 117:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** void HardwareSerial::begin(unsigned long baud, byte config)
+ 118:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 119:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // Try u2x mode first
+ 120:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   uint16_t baud_setting = (F_CPU / 4 / baud - 1) / 2;
+ 121:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ucsra = 1 << U2X0;
+ 122:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 123:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // hardcoded exception for 57600 for compatibility with the bootloader
+ 124:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // shipped with the Duemilanove and previous boards and the firmware
+ 125:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // on the 8U2 on the Uno and Mega 2560. Also, The baud_setting cannot
+ 126:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // be > 4095, so switch back to non-u2x mode if the baud rate is too
+ 127:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // low.
+ 128:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (((F_CPU == 16000000UL) && (baud == 57600)) || (baud_setting >4095))
+ 129:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   {
+ 130:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     *_ucsra = 0;
+ 131:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     baud_setting = (F_CPU / 8 / baud - 1) / 2;
+ 132:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 133:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 134:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // assign the baud_setting, a.k.a. ubrr (USART Baud Rate Register)
+ 135:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ubrrh = baud_setting >> 8;
+ 136:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ubrrl = baud_setting;
+ 137:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 138:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   _written = false;
+ 139:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 140:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   //set the data bits, parity, and stop bits
+ 141:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(__AVR_ATmega8__)
+ 142:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   config |= 0x80; // select UCSRC register (shared with UBRRH)
+ 143:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+ 144:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ucsrc = config;
+ 145:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   
+ 146:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   sbi(*_ucsrb, RXEN0);
+ 147:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   sbi(*_ucsrb, TXEN0);
+ 148:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   sbi(*_ucsrb, RXCIE0);
+ 149:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, UDRIE0);
+ 150:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 151:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 152:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** void HardwareSerial::end()
+ 153:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 154:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // wait for transmission of outgoing data
+ 155:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   flush();
+ 156:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 157:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, RXEN0);
+ 158:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, TXEN0);
+ 159:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, RXCIE0);
+ 160:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, UDRIE0);
+ 161:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   
+ 162:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // clear any received data
+ 163:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   _rx_buffer_head = _rx_buffer_tail;
+ 164:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 165:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 166:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** int HardwareSerial::available(void)
+ 167:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 140               	.LM0:
+ 141               	.LFBB1:
+ 142               	/* prologue: function */
+ 143               	/* frame size = 0 */
+ 144               	/* stack size = 0 */
+ 145               	.L__stack_usage = 0
+ 146 0000 FC01      		movw r30,r24
+ 168:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) % SERIAL_RX_BU
+ 148               	.LM1:
+ 149 0002 918D      		ldd r25,Z+25
+ 150 0004 228D      		ldd r18,Z+26
+ 151 0006 892F      		mov r24,r25
+ 152 0008 90E0      		ldi r25,0
+ 153 000a 805C      		subi r24,-64
+ 154 000c 9F4F      		sbci r25,-1
+ 155 000e 821B      		sub r24,r18
+ 156 0010 9109      		sbc r25,__zero_reg__
+ 169:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 158               	.LM2:
+ 159 0012 8F73      		andi r24,63
+ 160 0014 9927      		clr r25
+ 161 0016 0895      		ret
+ 163               	.Lscope1:
+ 165               		.stabd	78,0,0
+ 168               	.global	_ZN14HardwareSerial4peekEv
+ 170               	_ZN14HardwareSerial4peekEv:
+ 171               		.stabd	46,0,0
+ 170:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 171:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** int HardwareSerial::peek(void)
+ 172:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 173               	.LM3:
+ 174               	.LFBB2:
+ 175               	/* prologue: function */
+ 176               	/* frame size = 0 */
+ 177               	/* stack size = 0 */
+ 178               	.L__stack_usage = 0
+ 179 0018 FC01      		movw r30,r24
+ 173:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (_rx_buffer_head == _rx_buffer_tail) {
+ 181               	.LM4:
+ 182 001a 918D      		ldd r25,Z+25
+ 183 001c 828D      		ldd r24,Z+26
+ 184 001e 9817      		cp r25,r24
+ 185 0020 01F0      		breq .L4
+ 174:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return -1;
+ 175:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   } else {
+ 176:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return _rx_buffer[_rx_buffer_tail];
+ 187               	.LM5:
+ 188 0022 828D      		ldd r24,Z+26
+ 189 0024 E80F      		add r30,r24
+ 190 0026 F11D      		adc r31,__zero_reg__
+ 191 0028 858D      		ldd r24,Z+29
+ 192 002a 90E0      		ldi r25,0
+ 193 002c 0895      		ret
+ 194               	.L4:
+ 174:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return -1;
+ 196               	.LM6:
+ 197 002e 8FEF      		ldi r24,lo8(-1)
+ 198 0030 9FEF      		ldi r25,lo8(-1)
+ 177:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 178:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 200               	.LM7:
+ 201 0032 0895      		ret
+ 203               	.Lscope2:
+ 205               		.stabd	78,0,0
+ 208               	.global	_ZN14HardwareSerial4readEv
+ 210               	_ZN14HardwareSerial4readEv:
+ 211               		.stabd	46,0,0
+ 179:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 180:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** int HardwareSerial::read(void)
+ 181:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 213               	.LM8:
+ 214               	.LFBB3:
+ 215               	/* prologue: function */
+ 216               	/* frame size = 0 */
+ 217               	/* stack size = 0 */
+ 218               	.L__stack_usage = 0
+ 219 0034 FC01      		movw r30,r24
+ 220               	.LBB38:
+ 182:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // if the head isn't ahead of the tail, we don't have any characters
+ 183:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (_rx_buffer_head == _rx_buffer_tail) {
+ 222               	.LM9:
+ 223 0036 918D      		ldd r25,Z+25
+ 224 0038 828D      		ldd r24,Z+26
+ 225 003a 9817      		cp r25,r24
+ 226 003c 01F0      		breq .L8
+ 227               	.LBB39:
+ 184:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return -1;
+ 185:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   } else {
+ 186:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     unsigned char c = _rx_buffer[_rx_buffer_tail];
+ 229               	.LM10:
+ 230 003e 828D      		ldd r24,Z+26
+ 231 0040 DF01      		movw r26,r30
+ 232 0042 A80F      		add r26,r24
+ 233 0044 B11D      		adc r27,__zero_reg__
+ 234 0046 5D96      		adiw r26,29
+ 235 0048 8C91      		ld r24,X
+ 187:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) % SERIAL_RX_BUFFER_SIZE;
+ 237               	.LM11:
+ 238 004a 928D      		ldd r25,Z+26
+ 239 004c 9F5F      		subi r25,lo8(-(1))
+ 240 004e 9F73      		andi r25,lo8(63)
+ 241 0050 928F      		std Z+26,r25
+ 188:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return c;
+ 243               	.LM12:
+ 244 0052 90E0      		ldi r25,0
+ 245 0054 0895      		ret
+ 246               	.L8:
+ 247               	.LBE39:
+ 184:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return -1;
+ 249               	.LM13:
+ 250 0056 8FEF      		ldi r24,lo8(-1)
+ 251 0058 9FEF      		ldi r25,lo8(-1)
+ 252               	.LBE38:
+ 189:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 190:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 254               	.LM14:
+ 255 005a 0895      		ret
+ 260               	.Lscope3:
+ 262               		.stabd	78,0,0
+ 265               	.global	_ZN14HardwareSerial17availableForWriteEv
+ 267               	_ZN14HardwareSerial17availableForWriteEv:
+ 268               		.stabd	46,0,0
+ 191:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 192:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** int HardwareSerial::availableForWrite(void)
+ 193:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 270               	.LM15:
+ 271               	.LFBB4:
+ 272               	/* prologue: function */
+ 273               	/* frame size = 0 */
+ 274               	/* stack size = 0 */
+ 275               	.L__stack_usage = 0
+ 194:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   tx_buffer_index_t head;
+ 195:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   tx_buffer_index_t tail;
+ 196:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 197:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   TX_BUFFER_ATOMIC {
+ 198:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     head = _tx_buffer_head;
+ 277               	.LM16:
+ 278 005c FC01      		movw r30,r24
+ 279 005e 538D      		ldd r21,Z+27
+ 199:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     tail = _tx_buffer_tail;
+ 281               	.LM17:
+ 282 0060 448D      		ldd r20,Z+28
+ 283 0062 252F      		mov r18,r21
+ 284 0064 30E0      		ldi r19,0
+ 285 0066 842F      		mov r24,r20
+ 286 0068 90E0      		ldi r25,0
+ 200:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 201:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (head >= tail) return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
+ 288               	.LM18:
+ 289 006a 821B      		sub r24,r18
+ 290 006c 930B      		sbc r25,r19
+ 291 006e 5417      		cp r21,r20
+ 292 0070 00F0      		brlo .L10
+ 294               	.LM19:
+ 295 0072 CF96      		adiw r24,63
+ 296 0074 0895      		ret
+ 297               	.L10:
+ 202:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   return tail - head - 1;
+ 299               	.LM20:
+ 300 0076 0197      		sbiw r24,1
+ 203:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 302               	.LM21:
+ 303 0078 0895      		ret
+ 309               	.Lscope4:
+ 311               		.stabd	78,0,0
+ 313               		.weak	_Z14serialEventRunv
+ 315               	_Z14serialEventRunv:
+ 316               		.stabd	46,0,0
+  65:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #if defined(HAVE_HWSERIAL0)
+ 318               	.LM22:
+ 319               	.LFBB5:
+ 320               	/* prologue: function */
+ 321               	/* frame size = 0 */
+ 322               	/* stack size = 0 */
+ 323               	.L__stack_usage = 0
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+ 325               	.LM23:
+ 326 007a 80E0      		ldi r24,lo8(gs(_Z17Serial0_availablev))
+ 327 007c 90E0      		ldi r25,hi8(gs(_Z17Serial0_availablev))
+ 328 007e 892B      		or r24,r25
+ 329 0080 01F0      		breq .L12
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+ 331               	.LM24:
+ 332 0082 80E0      		ldi r24,lo8(gs(_Z11serialEventv))
+ 333 0084 90E0      		ldi r25,hi8(gs(_Z11serialEventv))
+ 334 0086 892B      		or r24,r25
+ 335 0088 01F0      		breq .L12
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+ 337               	.LM25:
+ 338 008a 0E94 0000 		call _Z17Serial0_availablev
+ 339 008e 8111      		cpse r24,__zero_reg__
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+ 341               	.LM26:
+ 342 0090 0C94 0000 		jmp _Z11serialEventv
+ 343               	.L12:
+ 344 0094 0895      		ret
+ 346               	.Lscope5:
+ 348               		.stabd	78,0,0
+ 351               	.global	_ZN14HardwareSerial17_tx_udr_empty_irqEv
+ 353               	_ZN14HardwareSerial17_tx_udr_empty_irqEv:
+ 354               		.stabd	46,0,0
+  90:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // If interrupts are enabled, there must be more data in the output
+ 356               	.LM27:
+ 357               	.LFBB6:
+ 358               	/* prologue: function */
+ 359               	/* frame size = 0 */
+ 360               	/* stack size = 0 */
+ 361               	.L__stack_usage = 0
+ 362 0096 FC01      		movw r30,r24
+  93:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_TX_BUFFER_SIZE;
+ 364               	.LM28:
+ 365 0098 848D      		ldd r24,Z+28
+ 366 009a DF01      		movw r26,r30
+ 367 009c A80F      		add r26,r24
+ 368 009e B11D      		adc r27,__zero_reg__
+ 369 00a0 A35A      		subi r26,-93
+ 370 00a2 BF4F      		sbci r27,-1
+ 371 00a4 2C91      		ld r18,X
+  94:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 373               	.LM29:
+ 374 00a6 848D      		ldd r24,Z+28
+ 375 00a8 90E0      		ldi r25,0
+ 376 00aa 0196      		adiw r24,1
+ 377 00ac 8F73      		andi r24,63
+ 378 00ae 9927      		clr r25
+ 379 00b0 848F      		std Z+28,r24
+  96:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 381               	.LM30:
+ 382 00b2 A689      		ldd r26,Z+22
+ 383 00b4 B789      		ldd r27,Z+23
+ 384 00b6 2C93      		st X,r18
+ 104:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #else
+ 386               	.LM31:
+ 387 00b8 A089      		ldd r26,Z+16
+ 388 00ba B189      		ldd r27,Z+17
+ 389 00bc 8C91      		ld r24,X
+ 390 00be 8370      		andi r24,lo8(3)
+ 391 00c0 8064      		ori r24,lo8(64)
+ 392 00c2 8C93      		st X,r24
+ 109:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // Buffer empty, so disable interrupts
+ 394               	.LM32:
+ 395 00c4 938D      		ldd r25,Z+27
+ 396 00c6 848D      		ldd r24,Z+28
+ 397 00c8 9813      		cpse r25,r24
+ 398 00ca 00C0      		rjmp .L22
+ 399               	.LBB42:
+ 400               	.LBB43:
+ 111:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 402               	.LM33:
+ 403 00cc 0288      		ldd __tmp_reg__,Z+18
+ 404 00ce F389      		ldd r31,Z+19
+ 405 00d0 E02D      		mov r30,__tmp_reg__
+ 406 00d2 8081      		ld r24,Z
+ 407 00d4 8F7D      		andi r24,lo8(-33)
+ 408 00d6 8083      		st Z,r24
+ 409               	.L22:
+ 410 00d8 0895      		ret
+ 411               	.LBE43:
+ 412               	.LBE42:
+ 417               	.Lscope6:
+ 419               		.stabd	78,0,0
+ 423               	.global	_ZN14HardwareSerial5writeEh
+ 425               	_ZN14HardwareSerial5writeEh:
+ 426               		.stabd	46,0,0
+ 204:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 205:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** void HardwareSerial::flush()
+ 206:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 207:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // If we have never written a byte, no need to flush. This special
+ 208:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // case is needed since there is no way to force the TXC (transmit
+ 209:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // complete) bit to 1 during initialization
+ 210:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (!_written)
+ 211:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return;
+ 212:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 213:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   while (bit_is_set(*_ucsrb, UDRIE0) || bit_is_clear(*_ucsra, TXC0)) {
+ 214:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     if (bit_is_clear(SREG, SREG_I) && bit_is_set(*_ucsrb, UDRIE0))
+ 215:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	// Interrupts are globally disabled, but the DR empty
+ 216:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	// interrupt should be enabled, so poll the DR empty flag to
+ 217:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	// prevent deadlock
+ 218:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	if (bit_is_set(*_ucsra, UDRE0))
+ 219:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	  _tx_udr_empty_irq();
+ 220:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 221:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // If we get here, nothing is queued anymore (DRIE is disabled) and
+ 222:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // the hardware finished tranmission (TXC is set).
+ 223:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 224:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 225:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** size_t HardwareSerial::write(uint8_t c)
+ 226:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** {
+ 428               	.LM34:
+ 429               	.LFBB7:
+ 430 00da EF92      		push r14
+ 431 00dc FF92      		push r15
+ 432 00de 0F93      		push r16
+ 433 00e0 1F93      		push r17
+ 434 00e2 CF93      		push r28
+ 435 00e4 DF93      		push r29
+ 436               	/* prologue: function */
+ 437               	/* frame size = 0 */
+ 438               	/* stack size = 6 */
+ 439               	.L__stack_usage = 6
+ 440 00e6 EC01      		movw r28,r24
+ 227:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   _written = true;
+ 442               	.LM35:
+ 443 00e8 81E0      		ldi r24,lo8(1)
+ 444 00ea 888F      		std Y+24,r24
+ 445               	.LBB65:
+ 228:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // If the buffer and the data register is empty, just write the byte
+ 229:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // to the data register and be done. This shortcut helps
+ 230:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // significantly improve the effective datarate at high (>
+ 231:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // 500kbit/s) bitrates, where interrupt overhead becomes a slowdown.
+ 232:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   if (_tx_buffer_head == _tx_buffer_tail && bit_is_set(*_ucsra, UDRE0)) {
+ 447               	.LM36:
+ 448 00ec 9B8D      		ldd r25,Y+27
+ 449 00ee 8C8D      		ldd r24,Y+28
+ 450 00f0 9813      		cpse r25,r24
+ 451 00f2 00C0      		rjmp .L25
+ 453               	.LM37:
+ 454 00f4 E889      		ldd r30,Y+16
+ 455 00f6 F989      		ldd r31,Y+17
+ 456 00f8 8081      		ld r24,Z
+ 457 00fa 85FD      		sbrc r24,5
+ 458 00fc 00C0      		rjmp .L26
+ 459               	.L25:
+ 460 00fe F62E      		mov r15,r22
+ 461               	.LBE65:
+ 462               	.LBB72:
+ 463               	.LBB73:
+ 233:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // If TXC is cleared before writing UDR and the previous byte
+ 234:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // completes before writing to UDR, TXC will be set but a byte
+ 235:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // is still being transmitted causing flush() to return too soon.
+ 236:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // So writing UDR must happen first.
+ 237:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // Writing UDR and clearing TC must be done atomically, otherwise
+ 238:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // interrupts might delay the TXC clear so the byte written to UDR
+ 239:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // is transmitted (setting TXC) before clearing TXC. Then TXC will
+ 240:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     // be cleared when no bytes are left, causing flush() to hang
+ 241:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+ 242:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       *_udr = c;
+ 243:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #ifdef MPCM0
+ 244:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << MPCM0))) | (1 << TXC0);
+ 245:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #else
+ 246:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << TXC0)));
+ 247:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #endif
+ 248:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     }
+ 249:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return 1;
+ 250:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 251:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   tx_buffer_index_t i = (_tx_buffer_head + 1) % SERIAL_TX_BUFFER_SIZE;
+ 465               	.LM38:
+ 466 0100 0B8D      		ldd r16,Y+27
+ 467 0102 10E0      		ldi r17,0
+ 468 0104 0F5F      		subi r16,-1
+ 469 0106 1F4F      		sbci r17,-1
+ 470 0108 0F73      		andi r16,63
+ 471 010a 1127      		clr r17
+ 472 010c E02E      		mov r14,r16
+ 473               	.L28:
+ 252:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	
+ 253:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // If the output buffer is full, there's nothing for it other than to 
+ 254:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // wait for the interrupt handler to empty it a bit
+ 255:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   while (i == _tx_buffer_tail) {
+ 475               	.LM39:
+ 476 010e 8C8D      		ldd r24,Y+28
+ 477 0110 E812      		cpse r14,r24
+ 478 0112 00C0      		rjmp .L27
+ 256:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     if (bit_is_clear(SREG, SREG_I)) {
+ 480               	.LM40:
+ 481 0114 0FB6      		in __tmp_reg__,__SREG__
+ 482 0116 07FC      		sbrc __tmp_reg__,7
+ 483 0118 00C0      		rjmp .L28
+ 257:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       // Interrupts are disabled, so we'll have to poll the data
+ 258:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       // register empty flag ourselves. If it is set, pretend an
+ 259:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       // interrupt has happened and call the handler to free up
+ 260:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       // space for us.
+ 261:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       if(bit_is_set(*_ucsra, UDRE0))
+ 485               	.LM41:
+ 486 011a E889      		ldd r30,Y+16
+ 487 011c F989      		ldd r31,Y+17
+ 488 011e 8081      		ld r24,Z
+ 489 0120 85FF      		sbrs r24,5
+ 490 0122 00C0      		rjmp .L28
+ 262:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	_tx_udr_empty_irq();
+ 492               	.LM42:
+ 493 0124 CE01      		movw r24,r28
+ 494 0126 0E94 0000 		call _ZN14HardwareSerial17_tx_udr_empty_irqEv
+ 495 012a 00C0      		rjmp .L28
+ 496               	.L27:
+ 263:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     } else {
+ 264:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       // nop, the interrupt handler will free up space for us
+ 265:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     }
+ 266:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 267:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 268:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   _tx_buffer[_tx_buffer_head] = c;
+ 498               	.LM43:
+ 499 012c 8B8D      		ldd r24,Y+27
+ 500 012e FE01      		movw r30,r28
+ 501 0130 E80F      		add r30,r24
+ 502 0132 F11D      		adc r31,__zero_reg__
+ 503 0134 E35A      		subi r30,-93
+ 504 0136 FF4F      		sbci r31,-1
+ 505 0138 F082      		st Z,r15
+ 506               	.LBB74:
+ 269:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 270:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // make atomic to prevent execution of ISR between setting the
+ 271:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // head pointer and setting the interrupt flag resulting in buffer
+ 272:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // retransmission
+ 273:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+ 508               	.LM44:
+ 509 013a 9FB7      		in r25,__SREG__
+ 510               	.LBB75:
+ 511               	.LBB76:
+ 513               	.Ltext1:
+   1:/usr/lib/avr/include/util/atomic.h **** /* Copyright (c) 2007 Dean Camera
+   2:/usr/lib/avr/include/util/atomic.h ****    All rights reserved.
+   3:/usr/lib/avr/include/util/atomic.h **** 
+   4:/usr/lib/avr/include/util/atomic.h ****    Redistribution and use in source and binary forms, with or without
+   5:/usr/lib/avr/include/util/atomic.h ****    modification, are permitted provided that the following conditions are met:
+   6:/usr/lib/avr/include/util/atomic.h **** 
+   7:/usr/lib/avr/include/util/atomic.h ****    * Redistributions of source code must retain the above copyright
+   8:/usr/lib/avr/include/util/atomic.h ****      notice, this list of conditions and the following disclaimer.
+   9:/usr/lib/avr/include/util/atomic.h **** 
+  10:/usr/lib/avr/include/util/atomic.h ****    * Redistributions in binary form must reproduce the above copyright
+  11:/usr/lib/avr/include/util/atomic.h ****      notice, this list of conditions and the following disclaimer in
+  12:/usr/lib/avr/include/util/atomic.h ****      the documentation and/or other materials provided with the
+  13:/usr/lib/avr/include/util/atomic.h ****      distribution.
+  14:/usr/lib/avr/include/util/atomic.h **** 
+  15:/usr/lib/avr/include/util/atomic.h ****    * Neither the name of the copyright holders nor the names of
+  16:/usr/lib/avr/include/util/atomic.h ****      contributors may be used to endorse or promote products derived
+  17:/usr/lib/avr/include/util/atomic.h ****      from this software without specific prior written permission.
+  18:/usr/lib/avr/include/util/atomic.h **** 
+  19:/usr/lib/avr/include/util/atomic.h ****   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  20:/usr/lib/avr/include/util/atomic.h ****   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  21:/usr/lib/avr/include/util/atomic.h ****   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  22:/usr/lib/avr/include/util/atomic.h ****   ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+  23:/usr/lib/avr/include/util/atomic.h ****   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  24:/usr/lib/avr/include/util/atomic.h ****   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  25:/usr/lib/avr/include/util/atomic.h ****   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  26:/usr/lib/avr/include/util/atomic.h ****   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  27:/usr/lib/avr/include/util/atomic.h ****   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  28:/usr/lib/avr/include/util/atomic.h ****   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  29:/usr/lib/avr/include/util/atomic.h ****   POSSIBILITY OF SUCH DAMAGE.
+  30:/usr/lib/avr/include/util/atomic.h **** */
+  31:/usr/lib/avr/include/util/atomic.h **** 
+  32:/usr/lib/avr/include/util/atomic.h **** /* $Id$ */
+  33:/usr/lib/avr/include/util/atomic.h **** 
+  34:/usr/lib/avr/include/util/atomic.h **** #ifndef _UTIL_ATOMIC_H_
+  35:/usr/lib/avr/include/util/atomic.h **** #define _UTIL_ATOMIC_H_ 1
+  36:/usr/lib/avr/include/util/atomic.h **** 
+  37:/usr/lib/avr/include/util/atomic.h **** #include <avr/io.h>
+  38:/usr/lib/avr/include/util/atomic.h **** #include <avr/interrupt.h>
+  39:/usr/lib/avr/include/util/atomic.h **** 
+  40:/usr/lib/avr/include/util/atomic.h **** #if !defined(__DOXYGEN__)
+  41:/usr/lib/avr/include/util/atomic.h **** /* Internal helper functions. */
+  42:/usr/lib/avr/include/util/atomic.h **** static __inline__ uint8_t __iSeiRetVal(void)
+  43:/usr/lib/avr/include/util/atomic.h **** {
+  44:/usr/lib/avr/include/util/atomic.h ****     sei();
+  45:/usr/lib/avr/include/util/atomic.h ****     return 1;
+  46:/usr/lib/avr/include/util/atomic.h **** }
+  47:/usr/lib/avr/include/util/atomic.h **** 
+  48:/usr/lib/avr/include/util/atomic.h **** static __inline__ uint8_t __iCliRetVal(void)
+  49:/usr/lib/avr/include/util/atomic.h **** {
+  50:/usr/lib/avr/include/util/atomic.h ****     cli();
+ 515               	.LM45:
+ 516               	/* #APP */
+ 517               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 518 013c F894      		cli
+ 519               	 ;  0 "" 2
+ 520               	/* #NOAPP */
+ 521               	.LBE76:
+ 522               	.LBE75:
+ 524               	.Ltext2:
+ 274:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     _tx_buffer_head = i;
+ 526               	.LM46:
+ 527 013e 0B8F      		std Y+27,r16
+ 275:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     sbi(*_ucsrb, UDRIE0);
+ 529               	.LM47:
+ 530 0140 EA89      		ldd r30,Y+18
+ 531 0142 FB89      		ldd r31,Y+19
+ 532 0144 8081      		ld r24,Z
+ 533 0146 8062      		ori r24,lo8(32)
+ 534 0148 00C0      		rjmp .L36
+ 535               	.L26:
+ 536               	.LBE74:
+ 537               	.LBE73:
+ 538               	.LBE72:
+ 539               	.LBB77:
+ 540               	.LBB66:
+ 541               	.LBB67:
+ 241:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****       *_udr = c;
+ 543               	.LM48:
+ 544 014a 9FB7      		in r25,__SREG__
+ 545               	.LBB68:
+ 546               	.LBB69:
+ 548               	.Ltext3:
+ 550               	.LM49:
+ 551               	/* #APP */
+ 552               	 ;  50 "/usr/lib/avr/include/util/atomic.h" 1
+ 553 014c F894      		cli
+ 554               	 ;  0 "" 2
+ 555               	/* #NOAPP */
+ 556               	.LBE69:
+ 557               	.LBE68:
+ 559               	.Ltext4:
+ 242:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #ifdef MPCM0
+ 561               	.LM50:
+ 562 014e EE89      		ldd r30,Y+22
+ 563 0150 FF89      		ldd r31,Y+23
+ 564 0152 6083      		st Z,r22
+ 244:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** #else
+ 566               	.LM51:
+ 567 0154 E889      		ldd r30,Y+16
+ 568 0156 F989      		ldd r31,Y+17
+ 569 0158 8081      		ld r24,Z
+ 570 015a 8370      		andi r24,lo8(3)
+ 571 015c 8064      		ori r24,lo8(64)
+ 572               	.L36:
+ 573 015e 8083      		st Z,r24
+ 574               	.LBB70:
+ 575               	.LBB71:
+ 577               	.Ltext5:
+  51:/usr/lib/avr/include/util/atomic.h ****     return 1;
+  52:/usr/lib/avr/include/util/atomic.h **** }
+  53:/usr/lib/avr/include/util/atomic.h **** 
+  54:/usr/lib/avr/include/util/atomic.h **** static __inline__ void __iSeiParam(const uint8_t *__s)
+  55:/usr/lib/avr/include/util/atomic.h **** {
+  56:/usr/lib/avr/include/util/atomic.h ****     sei();
+  57:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+  58:/usr/lib/avr/include/util/atomic.h ****     (void)__s;
+  59:/usr/lib/avr/include/util/atomic.h **** }
+  60:/usr/lib/avr/include/util/atomic.h **** 
+  61:/usr/lib/avr/include/util/atomic.h **** static __inline__ void __iCliParam(const uint8_t *__s)
+  62:/usr/lib/avr/include/util/atomic.h **** {
+  63:/usr/lib/avr/include/util/atomic.h ****     cli();
+  64:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+  65:/usr/lib/avr/include/util/atomic.h ****     (void)__s;
+  66:/usr/lib/avr/include/util/atomic.h **** }
+  67:/usr/lib/avr/include/util/atomic.h **** 
+  68:/usr/lib/avr/include/util/atomic.h **** static __inline__ void __iRestore(const  uint8_t *__s)
+  69:/usr/lib/avr/include/util/atomic.h **** {
+  70:/usr/lib/avr/include/util/atomic.h ****     SREG = *__s;
+ 579               	.LM52:
+ 580 0160 9FBF      		out __SREG__,r25
+  71:/usr/lib/avr/include/util/atomic.h ****     __asm__ volatile ("" ::: "memory");
+ 582               	.LM53:
+ 583               	.LBE71:
+ 584               	.LBE70:
+ 585               	.LBE67:
+ 586               	.LBE66:
+ 587               	.LBE77:
+ 589               	.Ltext6:
+ 276:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 277:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   
+ 278:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   return 1;
+ 279:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 591               	.LM54:
+ 592 0162 81E0      		ldi r24,lo8(1)
+ 593 0164 90E0      		ldi r25,0
+ 594               	/* epilogue start */
+ 595 0166 DF91      		pop r29
+ 596 0168 CF91      		pop r28
+ 597 016a 1F91      		pop r17
+ 598 016c 0F91      		pop r16
+ 599 016e FF90      		pop r15
+ 600 0170 EF90      		pop r14
+ 601 0172 0895      		ret
+ 612               	.Lscope7:
+ 614               		.stabd	78,0,0
+ 617               	.global	_ZN14HardwareSerial5flushEv
+ 619               	_ZN14HardwareSerial5flushEv:
+ 620               		.stabd	46,0,0
+ 206:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // If we have never written a byte, no need to flush. This special
+ 622               	.LM55:
+ 623               	.LFBB8:
+ 624 0174 CF93      		push r28
+ 625 0176 DF93      		push r29
+ 626               	/* prologue: function */
+ 627               	/* frame size = 0 */
+ 628               	/* stack size = 2 */
+ 629               	.L__stack_usage = 2
+ 630 0178 EC01      		movw r28,r24
+ 210:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     return;
+ 632               	.LM56:
+ 633 017a 888D      		ldd r24,Y+24
+ 634 017c 8823      		tst r24
+ 635 017e 01F0      		breq .L37
+ 636               	.L53:
+ 637               	.LBB80:
+ 638               	.LBB81:
+ 213:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     if (bit_is_clear(SREG, SREG_I) && bit_is_set(*_ucsrb, UDRIE0))
+ 640               	.LM57:
+ 641 0180 EA89      		ldd r30,Y+18
+ 642 0182 FB89      		ldd r31,Y+19
+ 643               	.L44:
+ 644 0184 8081      		ld r24,Z
+ 645 0186 85FD      		sbrc r24,5
+ 646 0188 00C0      		rjmp .L39
+ 647 018a A889      		ldd r26,Y+16
+ 648 018c B989      		ldd r27,Y+17
+ 649 018e 8C91      		ld r24,X
+ 650 0190 86FD      		sbrc r24,6
+ 651 0192 00C0      		rjmp .L37
+ 652               	.L39:
+ 214:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	// Interrupts are globally disabled, but the DR empty
+ 654               	.LM58:
+ 655 0194 0FB6      		in __tmp_reg__,__SREG__
+ 656 0196 07FC      		sbrc __tmp_reg__,7
+ 657 0198 00C0      		rjmp .L44
+ 658 019a 8081      		ld r24,Z
+ 659 019c 85FF      		sbrs r24,5
+ 660 019e 00C0      		rjmp .L44
+ 218:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 	  _tx_udr_empty_irq();
+ 662               	.LM59:
+ 663 01a0 A889      		ldd r26,Y+16
+ 664 01a2 B989      		ldd r27,Y+17
+ 665 01a4 8C91      		ld r24,X
+ 666 01a6 85FF      		sbrs r24,5
+ 667 01a8 00C0      		rjmp .L44
+ 219:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 669               	.LM60:
+ 670 01aa CE01      		movw r24,r28
+ 671 01ac 0E94 0000 		call _ZN14HardwareSerial17_tx_udr_empty_irqEv
+ 672 01b0 00C0      		rjmp .L53
+ 673               	.L37:
+ 674               	/* epilogue start */
+ 675               	.LBE81:
+ 676               	.LBE80:
+ 223:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 678               	.LM61:
+ 679 01b2 DF91      		pop r29
+ 680 01b4 CF91      		pop r28
+ 681 01b6 0895      		ret
+ 683               	.Lscope8:
+ 685               		.stabd	78,0,0
+ 690               	.global	_ZN14HardwareSerial5beginEmh
+ 692               	_ZN14HardwareSerial5beginEmh:
+ 693               		.stabd	46,0,0
+ 118:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // Try u2x mode first
+ 695               	.LM62:
+ 696               	.LFBB9:
+ 697 01b8 CF92      		push r12
+ 698 01ba DF92      		push r13
+ 699 01bc EF92      		push r14
+ 700 01be FF92      		push r15
+ 701 01c0 1F93      		push r17
+ 702 01c2 CF93      		push r28
+ 703 01c4 DF93      		push r29
+ 704               	/* prologue: function */
+ 705               	/* frame size = 0 */
+ 706               	/* stack size = 7 */
+ 707               	.L__stack_usage = 7
+ 708 01c6 EC01      		movw r28,r24
+ 709 01c8 6A01      		movw r12,r20
+ 710 01ca 7B01      		movw r14,r22
+ 711 01cc 122F      		mov r17,r18
+ 121:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 713               	.LM63:
+ 714 01ce E889      		ldd r30,Y+16
+ 715 01d0 F989      		ldd r31,Y+17
+ 716 01d2 82E0      		ldi r24,lo8(2)
+ 717 01d4 8083      		st Z,r24
+ 128:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   {
+ 719               	.LM64:
+ 720 01d6 4115      		cp r20,__zero_reg__
+ 721 01d8 514E      		sbci r21,-31
+ 722 01da 6105      		cpc r22,__zero_reg__
+ 723 01dc 7105      		cpc r23,__zero_reg__
+ 724 01de 01F0      		breq .L55
+ 120:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ucsra = 1 << U2X0;
+ 726               	.LM65:
+ 727 01e0 60E0      		ldi r22,0
+ 728 01e2 79E0      		ldi r23,lo8(9)
+ 729 01e4 8DE3      		ldi r24,lo8(61)
+ 730 01e6 90E0      		ldi r25,0
+ 731 01e8 A701      		movw r20,r14
+ 732 01ea 9601      		movw r18,r12
+ 733 01ec 0E94 0000 		call __udivmodsi4
+ 734 01f0 DA01      		movw r26,r20
+ 735 01f2 C901      		movw r24,r18
+ 736 01f4 0197      		sbiw r24,1
+ 737 01f6 A109      		sbc r26,__zero_reg__
+ 738 01f8 B109      		sbc r27,__zero_reg__
+ 739 01fa B695      		lsr r27
+ 740 01fc A795      		ror r26
+ 741 01fe 9795      		ror r25
+ 742 0200 8795      		ror r24
+ 743 0202 9C01      		movw r18,r24
+ 128:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   {
+ 745               	.LM66:
+ 746 0204 2115      		cp r18,__zero_reg__
+ 747 0206 80E1      		ldi r24,16
+ 748 0208 3807      		cpc r19,r24
+ 749 020a 00F0      		brlo .L56
+ 750               	.L55:
+ 130:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****     baud_setting = (F_CPU / 8 / baud - 1) / 2;
+ 752               	.LM67:
+ 753 020c E889      		ldd r30,Y+16
+ 754 020e F989      		ldd r31,Y+17
+ 755 0210 1082      		st Z,__zero_reg__
+ 131:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   }
+ 757               	.LM68:
+ 758 0212 60E8      		ldi r22,lo8(-128)
+ 759 0214 74E8      		ldi r23,lo8(-124)
+ 760 0216 8EE1      		ldi r24,lo8(30)
+ 761 0218 90E0      		ldi r25,0
+ 762 021a A701      		movw r20,r14
+ 763 021c 9601      		movw r18,r12
+ 764 021e 0E94 0000 		call __udivmodsi4
+ 765 0222 DA01      		movw r26,r20
+ 766 0224 C901      		movw r24,r18
+ 767 0226 0197      		sbiw r24,1
+ 768 0228 A109      		sbc r26,__zero_reg__
+ 769 022a B109      		sbc r27,__zero_reg__
+ 770 022c B695      		lsr r27
+ 771 022e A795      		ror r26
+ 772 0230 9795      		ror r25
+ 773 0232 8795      		ror r24
+ 774 0234 9C01      		movw r18,r24
+ 775               	.L56:
+ 135:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   *_ubrrl = baud_setting;
+ 777               	.LM69:
+ 778 0236 EC85      		ldd r30,Y+12
+ 779 0238 FD85      		ldd r31,Y+13
+ 780 023a 3083      		st Z,r19
+ 136:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 782               	.LM70:
+ 783 023c EE85      		ldd r30,Y+14
+ 784 023e FF85      		ldd r31,Y+15
+ 785 0240 2083      		st Z,r18
+ 138:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 787               	.LM71:
+ 788 0242 188E      		std Y+24,__zero_reg__
+ 144:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   
+ 790               	.LM72:
+ 791 0244 EC89      		ldd r30,Y+20
+ 792 0246 FD89      		ldd r31,Y+21
+ 793 0248 1083      		st Z,r17
+ 146:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   sbi(*_ucsrb, TXEN0);
+ 795               	.LM73:
+ 796 024a EA89      		ldd r30,Y+18
+ 797 024c FB89      		ldd r31,Y+19
+ 798 024e 8081      		ld r24,Z
+ 799 0250 8061      		ori r24,lo8(16)
+ 800 0252 8083      		st Z,r24
+ 147:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   sbi(*_ucsrb, RXCIE0);
+ 802               	.LM74:
+ 803 0254 EA89      		ldd r30,Y+18
+ 804 0256 FB89      		ldd r31,Y+19
+ 805 0258 8081      		ld r24,Z
+ 806 025a 8860      		ori r24,lo8(8)
+ 807 025c 8083      		st Z,r24
+ 148:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, UDRIE0);
+ 809               	.LM75:
+ 810 025e EA89      		ldd r30,Y+18
+ 811 0260 FB89      		ldd r31,Y+19
+ 812 0262 8081      		ld r24,Z
+ 813 0264 8068      		ori r24,lo8(-128)
+ 814 0266 8083      		st Z,r24
+ 149:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 816               	.LM76:
+ 817 0268 EA89      		ldd r30,Y+18
+ 818 026a FB89      		ldd r31,Y+19
+ 819 026c 8081      		ld r24,Z
+ 820 026e 8F7D      		andi r24,lo8(-33)
+ 821 0270 8083      		st Z,r24
+ 822               	/* epilogue start */
+ 150:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 824               	.LM77:
+ 825 0272 DF91      		pop r29
+ 826 0274 CF91      		pop r28
+ 827 0276 1F91      		pop r17
+ 828 0278 FF90      		pop r15
+ 829 027a EF90      		pop r14
+ 830 027c DF90      		pop r13
+ 831 027e CF90      		pop r12
+ 832 0280 0895      		ret
+ 837               	.Lscope9:
+ 839               		.stabd	78,0,0
+ 842               	.global	_ZN14HardwareSerial3endEv
+ 844               	_ZN14HardwareSerial3endEv:
+ 845               		.stabd	46,0,0
+ 153:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   // wait for transmission of outgoing data
+ 847               	.LM78:
+ 848               	.LFBB10:
+ 849 0282 CF93      		push r28
+ 850 0284 DF93      		push r29
+ 851               	/* prologue: function */
+ 852               	/* frame size = 0 */
+ 853               	/* stack size = 2 */
+ 854               	.L__stack_usage = 2
+ 855 0286 EC01      		movw r28,r24
+ 155:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 857               	.LM79:
+ 858 0288 E881      		ld r30,Y
+ 859 028a F981      		ldd r31,Y+1
+ 860 028c 0680      		ldd __tmp_reg__,Z+6
+ 861 028e F781      		ldd r31,Z+7
+ 862 0290 E02D      		mov r30,__tmp_reg__
+ 863 0292 0995      		icall
+ 157:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, TXEN0);
+ 865               	.LM80:
+ 866 0294 EA89      		ldd r30,Y+18
+ 867 0296 FB89      		ldd r31,Y+19
+ 868 0298 8081      		ld r24,Z
+ 869 029a 8F7E      		andi r24,lo8(-17)
+ 870 029c 8083      		st Z,r24
+ 158:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, RXCIE0);
+ 872               	.LM81:
+ 873 029e EA89      		ldd r30,Y+18
+ 874 02a0 FB89      		ldd r31,Y+19
+ 875 02a2 8081      		ld r24,Z
+ 876 02a4 877F      		andi r24,lo8(-9)
+ 877 02a6 8083      		st Z,r24
+ 159:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   cbi(*_ucsrb, UDRIE0);
+ 879               	.LM82:
+ 880 02a8 EA89      		ldd r30,Y+18
+ 881 02aa FB89      		ldd r31,Y+19
+ 882 02ac 8081      		ld r24,Z
+ 883 02ae 8F77      		andi r24,lo8(127)
+ 884 02b0 8083      		st Z,r24
+ 160:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp ****   
+ 886               	.LM83:
+ 887 02b2 EA89      		ldd r30,Y+18
+ 888 02b4 FB89      		ldd r31,Y+19
+ 889 02b6 8081      		ld r24,Z
+ 890 02b8 8F7D      		andi r24,lo8(-33)
+ 891 02ba 8083      		st Z,r24
+ 163:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** }
+ 893               	.LM84:
+ 894 02bc 8A8D      		ldd r24,Y+26
+ 895 02be 898F      		std Y+25,r24
+ 896               	/* epilogue start */
+ 164:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/HardwareSerial.cpp **** 
+ 898               	.LM85:
+ 899 02c0 DF91      		pop r29
+ 900 02c2 CF91      		pop r28
+ 901 02c4 0895      		ret
+ 903               	.Lscope10:
+ 905               		.stabd	78,0,0
+ 906               		.weak	_ZTV14HardwareSerial
+ 907               		.section	.rodata._ZTV14HardwareSerial,"aG",@progbits,_ZTV14HardwareSerial,comdat
+ 910               	_ZTV14HardwareSerial:
+ 911 0000 0000      		.word	0
+ 912 0002 0000      		.word	0
+ 913 0004 0000      		.word	gs(_ZN14HardwareSerial5writeEh)
+ 914 0006 0000      		.word	gs(_ZN5Print5writeEPKhj)
+ 915 0008 0000      		.word	gs(_ZN14HardwareSerial17availableForWriteEv)
+ 916 000a 0000      		.word	gs(_ZN14HardwareSerial5flushEv)
+ 917 000c 0000      		.word	gs(_ZN14HardwareSerial9availableEv)
+ 918 000e 0000      		.word	gs(_ZN14HardwareSerial4readEv)
+ 919 0010 0000      		.word	gs(_ZN14HardwareSerial4peekEv)
+ 934               		.weak	_Z11serialEventv
+ 935               		.weak	_Z17Serial0_availablev
+ 936               		.text
+ 938               	.Letext0:
+ 939               		.ident	"GCC: (GNU) 5.4.0"
+ 940               	.global __do_copy_data
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 HardwareSerial.cpp
+     /tmp/cciFHRb7.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/cciFHRb7.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/cciFHRb7.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/cciFHRb7.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/cciFHRb7.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/cciFHRb7.s:137    .text:0000000000000000 _ZN14HardwareSerial9availableEv
+     /tmp/cciFHRb7.s:170    .text:0000000000000018 _ZN14HardwareSerial4peekEv
+     /tmp/cciFHRb7.s:210    .text:0000000000000034 _ZN14HardwareSerial4readEv
+     /tmp/cciFHRb7.s:267    .text:000000000000005c _ZN14HardwareSerial17availableForWriteEv
+     /tmp/cciFHRb7.s:315    .text:000000000000007a _Z14serialEventRunv
+     /tmp/cciFHRb7.s:353    .text:0000000000000096 _ZN14HardwareSerial17_tx_udr_empty_irqEv
+     /tmp/cciFHRb7.s:425    .text:00000000000000da _ZN14HardwareSerial5writeEh
+     /tmp/cciFHRb7.s:619    .text:0000000000000174 _ZN14HardwareSerial5flushEv
+     /tmp/cciFHRb7.s:692    .text:00000000000001b8 _ZN14HardwareSerial5beginEmh
+     /tmp/cciFHRb7.s:844    .text:0000000000000282 _ZN14HardwareSerial3endEv
+     /tmp/cciFHRb7.s:910    .rodata._ZTV14HardwareSerial:0000000000000000 _ZTV14HardwareSerial
+
+UNDEFINED SYMBOLS
+_Z17Serial0_availablev
+_Z11serialEventv
+__udivmodsi4
+_ZN5Print5writeEPKhj
+__do_copy_data

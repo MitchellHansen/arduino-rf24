@@ -1,0 +1,242 @@
+   1               		.file	"wiring_shift.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 136               	.global	shiftIn
+ 138               	shiftIn:
+ 139               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** /*
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   wiring_shift.c - shiftOut() function
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   Part of Arduino - http://www.arduino.cc/
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   Copyright (c) 2005-2006 David A. Mellis
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   This library is free software; you can redistribute it and/or
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   modify it under the terms of the GNU Lesser General Public
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   License as published by the Free Software Foundation; either
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   version 2.1 of the License, or (at your option) any later version.
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   This library is distributed in the hope that it will be useful,
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   Lesser General Public License for more details.
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   You should have received a copy of the GNU Lesser General
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   Public License along with this library; if not, write to the
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c ****   Boston, MA  02111-1307  USA
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** */
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** #include "wiring_private.h"
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
+ 141               	.LM0:
+ 142               	.LFBB1:
+ 143 0000 CF92      		push r12
+ 144 0002 DF92      		push r13
+ 145 0004 EF92      		push r14
+ 146 0006 FF92      		push r15
+ 147 0008 0F93      		push r16
+ 148 000a 1F93      		push r17
+ 149 000c CF93      		push r28
+ 150 000e DF93      		push r29
+ 151               	/* prologue: function */
+ 152               	/* frame size = 0 */
+ 153               	/* stack size = 8 */
+ 154               	.L__stack_usage = 8
+ 155 0010 F82E      		mov r15,r24
+ 156 0012 D62F      		mov r29,r22
+ 157 0014 E42E      		mov r14,r20
+ 159               	.LM1:
+ 160 0016 07E0      		ldi r16,lo8(7)
+ 161 0018 10E0      		ldi r17,0
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	uint8_t value = 0;
+ 163               	.LM2:
+ 164 001a C0E0      		ldi r28,0
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	uint8_t i;
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	for (i = 0; i < 8; ++i) {
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		digitalWrite(clockPin, HIGH);
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		if (bitOrder == LSBFIRST)
+  32:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 			value |= digitalRead(dataPin) << i;
+ 166               	.LM3:
+ 167 001c 87E0      		ldi r24,lo8(7)
+ 168 001e C82E      		mov r12,r24
+ 169 0020 D12C      		mov r13,__zero_reg__
+ 170               	.L4:
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		if (bitOrder == LSBFIRST)
+ 172               	.LM4:
+ 173 0022 61E0      		ldi r22,lo8(1)
+ 174 0024 8D2F      		mov r24,r29
+ 175 0026 0E94 0000 		call digitalWrite
+ 177               	.LM5:
+ 178 002a 8F2D      		mov r24,r15
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 			value |= digitalRead(dataPin) << i;
+ 180               	.LM6:
+ 181 002c E110      		cpse r14,__zero_reg__
+ 182 002e 00C0      		rjmp .L2
+ 184               	.LM7:
+ 185 0030 0E94 0000 		call digitalRead
+ 186 0034 9601      		movw r18,r12
+ 187 0036 201B      		sub r18,r16
+ 188 0038 310B      		sbc r19,r17
+ 189 003a 00C0      		rjmp 2f
+ 190               		1:
+ 191 003c 880F      		lsl r24
+ 192               		2:
+ 193 003e 2A95      		dec r18
+ 194 0040 02F4      		brpl 1b
+ 195 0042 00C0      		rjmp .L6
+ 196               	.L2:
+  33:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		else
+  34:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 			value |= digitalRead(dataPin) << (7 - i);
+ 198               	.LM8:
+ 199 0044 0E94 0000 		call digitalRead
+ 200 0048 002E      		mov r0,r16
+ 201 004a 00C0      		rjmp 2f
+ 202               		1:
+ 203 004c 880F      		lsl r24
+ 204               		2:
+ 205 004e 0A94      		dec r0
+ 206 0050 02F4      		brpl 1b
+ 207               	.L6:
+ 208 0052 C82B      		or r28,r24
+  35:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		digitalWrite(clockPin, LOW);
+ 210               	.LM9:
+ 211 0054 60E0      		ldi r22,0
+ 212 0056 8D2F      		mov r24,r29
+ 213 0058 0E94 0000 		call digitalWrite
+ 214 005c 0150      		subi r16,1
+ 215 005e 1109      		sbc r17,__zero_reg__
+ 216 0060 00F4      		brcc .L4
+  36:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	}
+  37:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	return value;
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** }
+ 218               	.LM10:
+ 219 0062 8C2F      		mov r24,r28
+ 220               	/* epilogue start */
+ 221 0064 DF91      		pop r29
+ 222 0066 CF91      		pop r28
+ 223 0068 1F91      		pop r17
+ 224 006a 0F91      		pop r16
+ 225 006c FF90      		pop r15
+ 226 006e EF90      		pop r14
+ 227 0070 DF90      		pop r13
+ 228 0072 CF90      		pop r12
+ 229 0074 0895      		ret
+ 234               	.Lscope1:
+ 236               		.stabd	78,0,0
+ 242               	.global	shiftOut
+ 244               	shiftOut:
+ 245               		.stabd	46,0,0
+  39:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+  40:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val)
+  41:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** {
+ 247               	.LM11:
+ 248               	.LFBB2:
+ 249 0076 BF92      		push r11
+ 250 0078 CF92      		push r12
+ 251 007a DF92      		push r13
+ 252 007c EF92      		push r14
+ 253 007e FF92      		push r15
+ 254 0080 0F93      		push r16
+ 255 0082 1F93      		push r17
+ 256 0084 CF93      		push r28
+ 257 0086 DF93      		push r29
+ 258               	/* prologue: function */
+ 259               	/* frame size = 0 */
+ 260               	/* stack size = 9 */
+ 261               	.L__stack_usage = 9
+ 262 0088 C82E      		mov r12,r24
+ 263 008a D62E      		mov r13,r22
+ 264 008c B42E      		mov r11,r20
+ 266               	.LM12:
+ 267 008e C7E0      		ldi r28,lo8(7)
+ 268 0090 D0E0      		ldi r29,0
+ 269 0092 022F      		mov r16,r18
+ 270 0094 10E0      		ldi r17,0
+  42:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	uint8_t i;
+  43:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 
+  44:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	for (i = 0; i < 8; i++)  {
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		if (bitOrder == LSBFIRST)
+  46:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 			digitalWrite(dataPin, !!(val & (1 << i)));
+ 272               	.LM13:
+ 273 0096 87E0      		ldi r24,lo8(7)
+ 274 0098 E82E      		mov r14,r24
+ 275 009a F12C      		mov r15,__zero_reg__
+ 276               	.L11:
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 			digitalWrite(dataPin, !!(val & (1 << i)));
+ 278               	.LM14:
+ 279 009c B110      		cpse r11,__zero_reg__
+ 280 009e 00C0      		rjmp .L9
+ 282               	.LM15:
+ 283 00a0 C701      		movw r24,r14
+ 284 00a2 8C1B      		sub r24,r28
+ 285 00a4 9D0B      		sbc r25,r29
+ 286 00a6 B801      		movw r22,r16
+ 287 00a8 00C0      		rjmp .L13
+ 288               	.L9:
+  47:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		else	
+  48:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 			digitalWrite(dataPin, !!(val & (1 << (7 - i))));
+ 290               	.LM16:
+ 291 00aa B801      		movw r22,r16
+ 292 00ac 8C2F      		mov r24,r28
+ 293               	.L13:
+ 294 00ae 00C0      		rjmp 2f
+ 295               		1:
+ 296 00b0 7595      		asr r23
+ 297 00b2 6795      		ror r22
+ 298               		2:
+ 299 00b4 8A95      		dec r24
+ 300 00b6 02F4      		brpl 1b
+ 301 00b8 6170      		andi r22,lo8(1)
+ 302 00ba 8C2D      		mov r24,r12
+ 303 00bc 0E94 0000 		call digitalWrite
+  49:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 			
+  50:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		digitalWrite(clockPin, HIGH);
+ 305               	.LM17:
+ 306 00c0 61E0      		ldi r22,lo8(1)
+ 307 00c2 8D2D      		mov r24,r13
+ 308 00c4 0E94 0000 		call digitalWrite
+  51:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 		digitalWrite(clockPin, LOW);		
+ 310               	.LM18:
+ 311 00c8 60E0      		ldi r22,0
+ 312 00ca 8D2D      		mov r24,r13
+ 313 00cc 0E94 0000 		call digitalWrite
+ 314 00d0 2197      		sbiw r28,1
+ 315 00d2 00F4      		brcc .L11
+ 316               	/* epilogue start */
+  52:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** 	}
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/wiring_shift.c **** }
+ 318               	.LM19:
+ 319 00d4 DF91      		pop r29
+ 320 00d6 CF91      		pop r28
+ 321 00d8 1F91      		pop r17
+ 322 00da 0F91      		pop r16
+ 323 00dc FF90      		pop r15
+ 324 00de EF90      		pop r14
+ 325 00e0 DF90      		pop r13
+ 326 00e2 CF90      		pop r12
+ 327 00e4 BF90      		pop r11
+ 328 00e6 0895      		ret
+ 330               	.Lscope2:
+ 332               		.stabd	78,0,0
+ 348               	.Letext0:
+ 349               		.ident	"GCC: (GNU) 5.4.0"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 wiring_shift.c
+     /tmp/ccPyyvV5.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccPyyvV5.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccPyyvV5.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccPyyvV5.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccPyyvV5.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccPyyvV5.s:138    .text:0000000000000000 shiftIn
+     /tmp/ccPyyvV5.s:244    .text:0000000000000076 shiftOut
+
+UNDEFINED SYMBOLS
+digitalWrite
+digitalRead

@@ -1,0 +1,1084 @@
+   1               		.file	"SoftPWM.cpp"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 134               	.global	__vector_11
+ 136               	__vector_11:
+ 137               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** /*
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @author         Brett Hagman <bhagman@wiring.org.co>
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @contribution   Paul Stoffregen (paul at pjrc dot com)
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @url            http://wiring.org.co/
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @url            http://roguerobotics.com/
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** ||
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @description
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | A Software PWM Library
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | 
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | Written by Brett Hagman
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | http://www.roguerobotics.com/
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | bhagman@roguerobotics.com, bhagman@wiring.org.co
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || |
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | A Wiring (and Arduino) Library, for Atmel AVR8 bit series microcontrollers,
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | to produce PWM signals on any arbitrary pin.
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | 
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | It was originally designed for controlling the brightness of LEDs, but
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | could be adapted to control servos and other low frequency PWM controlled
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | devices as well.
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | 
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | It uses a single hardware timer (Timer 2) on the Atmel microcontroller to
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | generate up to 20 PWM channels (your mileage may vary).
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | 
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || #
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** ||
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @license Please see the accompanying LICENSE.txt file for this project.
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** ||
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @notes
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || | Minor modification by Paul Stoffregen to support different timers.
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || |
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || #
+  32:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** ||
+  33:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @name Software PWM Library
+  34:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @type Library
+  35:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @target Atmel AVR 8 Bit
+  36:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** ||
+  37:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** || @version 1.0.1
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** ||
+  39:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** */
+  40:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  41:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #include <avr/io.h>
+  42:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #include <avr/interrupt.h>
+  43:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #include "SoftPWM.h"
+  44:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #include "SoftPWM_timer.h"
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  46:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #if defined(WIRING)
+  47:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #include <wiring_private.h>
+  48:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #elif ARDUINO >= 100
+  49:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #include <Arduino.h>
+  50:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #else
+  51:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  52:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #include <Arduino.h>
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  54:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #endif
+  55:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  56:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #if F_CPU
+  57:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #define SOFTPWM_FREQ 60UL
+  58:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #define SOFTPWM_OCR (F_CPU/(8UL*256UL*SOFTPWM_FREQ))
+  59:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #else
+  60:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** // 130 == 60 Hz (on 16 MHz part)
+  61:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #define SOFTPWM_OCR 130
+  62:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #endif
+  63:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  64:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** volatile uint8_t _isr_softcount = 0xff;
+  65:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** uint8_t _softpwm_defaultPolarity = SOFTPWM_NORMAL;
+  66:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** typedef struct {
+  68:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // hardware I/O port and pin for this channel
+  69:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     int8_t pin;
+  70:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t polarity;
+  71:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     volatile uint8_t *outport;
+  72:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t pinmask;
+  73:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t pwmvalue;
+  74:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t checkval;
+  75:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t fadeuprate;
+  76:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t fadedownrate;
+  77:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** } softPWMChannel;
+  78:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  79:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** softPWMChannel _softpwm_channels[SOFTPWM_MAXCHANNELS];
+  80:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  81:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  82:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** // Here is the meat and gravy
+  83:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #ifdef WIRING
+  84:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** void SoftPWM_Timer_Interrupt(void)
+  85:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #else
+  86:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** ISR(TIMER1_COMPA_vect)
+  87:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** #endif
+  88:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** {
+ 139               	.LM0:
+ 140               	.LFBB1:
+ 141 0000 1F92      		push r1
+ 142 0002 0F92      		push r0
+ 143 0004 0FB6      		in r0,__SREG__
+ 144 0006 0F92      		push r0
+ 145 0008 1124      		clr __zero_reg__
+ 146 000a 2F93      		push r18
+ 147 000c 3F93      		push r19
+ 148 000e 4F93      		push r20
+ 149 0010 6F93      		push r22
+ 150 0012 7F93      		push r23
+ 151 0014 8F93      		push r24
+ 152 0016 9F93      		push r25
+ 153 0018 AF93      		push r26
+ 154 001a BF93      		push r27
+ 155 001c EF93      		push r30
+ 156 001e FF93      		push r31
+ 157               	/* prologue: Signal */
+ 158               	/* frame size = 0 */
+ 159               	/* stack size = 14 */
+ 160               	.L__stack_usage = 14
+  89:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  90:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t i;
+  91:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     int16_t newvalue;
+  92:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     int16_t direction;
+  93:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+  94:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     if (++_isr_softcount == 0)
+ 162               	.LM1:
+ 163 0020 8091 0000 		lds r24,_isr_softcount
+ 164 0024 8F5F      		subi r24,lo8(-(1))
+ 165 0026 8093 0000 		sts _isr_softcount,r24
+ 166 002a 8823      		tst r24
+ 167 002c 01F0      		breq .L2
+ 168               	.L13:
+ 169 002e E0E0      		ldi r30,lo8(_softpwm_channels)
+ 170 0030 F0E0      		ldi r31,hi8(_softpwm_channels)
+ 171 0032 00C0      		rjmp .L3
+ 172               	.L2:
+ 173 0034 E0E0      		ldi r30,lo8(_softpwm_channels)
+ 174 0036 F0E0      		ldi r31,hi8(_softpwm_channels)
+ 175               	.L14:
+  95:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     {
+  96:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         // set all channels high - let's start again
+  97:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         // and accept new checkvals
+  98:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+  99:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (_softpwm_channels[i].fadeuprate > 0 || _softpwm_channels[i].fadedownrate > 0) {
+ 177               	.LM2:
+ 178 0038 4781      		ldd r20,Z+7
+ 179 003a 2581      		ldd r18,Z+5
+ 180 003c 4111      		cpse r20,__zero_reg__
+ 181 003e 00C0      		rjmp .L4
+ 183               	.LM3:
+ 184 0040 8085      		ldd r24,Z+8
+ 185 0042 8823      		tst r24
+ 186 0044 01F0      		breq .L5
+ 187               	.L4:
+ 100:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 // we want to fade to the new value
+ 101:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 direction = _softpwm_channels[i].pwmvalue - _softpwm_channels[i].checkval;
+ 189               	.LM4:
+ 190 0046 30E0      		ldi r19,0
+ 191 0048 8681      		ldd r24,Z+6
+ 192 004a 90E0      		ldi r25,0
+ 193 004c B901      		movw r22,r18
+ 194 004e 681B      		sub r22,r24
+ 195 0050 790B      		sbc r23,r25
+ 102:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 103:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 // we will default to jumping to the new value
+ 104:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 newvalue = _softpwm_channels[i].pwmvalue;
+ 105:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 106:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 if (direction > 0 && _softpwm_channels[i].fadeuprate > 0) {
+ 197               	.LM5:
+ 198 0052 1616      		cp __zero_reg__,r22
+ 199 0054 1706      		cpc __zero_reg__,r23
+ 200 0056 04F4      		brge .L6
+ 202               	.LM6:
+ 203 0058 4423      		tst r20
+ 204 005a 01F0      		breq .L5
+ 107:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     newvalue = _softpwm_channels[i].checkval + _softpwm_channels[i].fadeuprate;
+ 206               	.LM7:
+ 207 005c 840F      		add r24,r20
+ 208 005e 911D      		adc r25,__zero_reg__
+ 209 0060 8217      		cp r24,r18
+ 210 0062 9307      		cpc r25,r19
+ 211 0064 04F4      		brge .L5
+ 212 0066 00C0      		rjmp .L32
+ 213               	.L6:
+ 108:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     if (newvalue > _softpwm_channels[i].pwmvalue)
+ 109:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                         newvalue = _softpwm_channels[i].pwmvalue;
+ 110:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 } else if (direction < 0 && _softpwm_channels[i].fadedownrate > 0) {
+ 215               	.LM8:
+ 216 0068 672B      		or r22,r23
+ 217 006a 01F0      		breq .L5
+ 219               	.LM9:
+ 220 006c 4085      		ldd r20,Z+8
+ 221 006e 4423      		tst r20
+ 222 0070 01F0      		breq .L5
+ 111:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     newvalue = _softpwm_channels[i].checkval - _softpwm_channels[i].fadedownrate;
+ 224               	.LM10:
+ 225 0072 841B      		sub r24,r20
+ 226 0074 9109      		sbc r25,__zero_reg__
+ 227 0076 2817      		cp r18,r24
+ 228 0078 3907      		cpc r19,r25
+ 229 007a 04F4      		brge .L5
+ 230               	.L32:
+ 231 007c 9C01      		movw r18,r24
+ 232               	.L5:
+ 112:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     if (newvalue < _softpwm_channels[i].pwmvalue)
+ 113:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                         newvalue = _softpwm_channels[i].pwmvalue;
+ 114:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 }
+ 115:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 116:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 _softpwm_channels[i].checkval = newvalue;
+ 117:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             } else  // just set the channel to the new value
+ 118:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 _softpwm_channels[i].checkval = _softpwm_channels[i].pwmvalue;
+ 234               	.LM11:
+ 235 007e 2683      		std Z+6,r18
+ 119:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 120:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             // now set the pin high (if not 0)
+ 121:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (_softpwm_channels[i].checkval > 0)  // don't set if checkval == 0
+ 237               	.LM12:
+ 238 0080 8681      		ldd r24,Z+6
+ 239 0082 8823      		tst r24
+ 240 0084 01F0      		breq .L11
+ 122:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             {
+ 123:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 if (_softpwm_channels[i].polarity == SOFTPWM_NORMAL)
+ 242               	.LM13:
+ 243 0086 9181      		ldd r25,Z+1
+ 244 0088 A281      		ldd r26,Z+2
+ 245 008a B381      		ldd r27,Z+3
+ 246 008c 8481      		ldd r24,Z+4
+ 247 008e 9111      		cpse r25,__zero_reg__
+ 248 0090 00C0      		rjmp .L12
+ 124:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     *_softpwm_channels[i].outport |= _softpwm_channels[i].pinmask;
+ 250               	.LM14:
+ 251 0092 9C91      		ld r25,X
+ 252 0094 892B      		or r24,r25
+ 253 0096 00C0      		rjmp .L33
+ 254               	.L12:
+ 125:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 else
+ 126:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);
+ 256               	.LM15:
+ 257 0098 9C91      		ld r25,X
+ 258 009a 8095      		com r24
+ 259 009c 8923      		and r24,r25
+ 260               	.L33:
+ 261 009e 8C93      		st X,r24
+ 262               	.L11:
+ 263 00a0 3996      		adiw r30,9
+  98:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (_softpwm_channels[i].fadeuprate > 0 || _softpwm_channels[i].fadedownrate > 0) {
+ 265               	.LM16:
+ 266 00a2 80E0      		ldi r24,hi8(_softpwm_channels+180)
+ 267 00a4 E030      		cpi r30,lo8(_softpwm_channels+180)
+ 268 00a6 F807      		cpc r31,r24
+ 269 00a8 01F4      		brne .L14
+ 270 00aa 00C0      		rjmp .L13
+ 271               	.L3:
+ 127:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             }
+ 128:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 129:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         }
+ 130:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 131:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 132:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
+ 133:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     {
+ 134:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if (_softpwm_channels[i].pin >= 0)  // if it's a valid pin
+ 273               	.LM17:
+ 274 00ac 8081      		ld r24,Z
+ 275 00ae 87FD      		sbrc r24,7
+ 276 00b0 00C0      		rjmp .L15
+ 135:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         {
+ 136:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (_softpwm_channels[i].checkval == _isr_softcount)  // if we have hit the width
+ 278               	.LM18:
+ 279 00b2 8091 0000 		lds r24,_isr_softcount
+ 280 00b6 9681      		ldd r25,Z+6
+ 281 00b8 9813      		cpse r25,r24
+ 282 00ba 00C0      		rjmp .L15
+ 137:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             {
+ 138:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 // turn off the channel
+ 139:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 if (_softpwm_channels[i].polarity == SOFTPWM_NORMAL)
+ 284               	.LM19:
+ 285 00bc 9181      		ldd r25,Z+1
+ 286 00be A281      		ldd r26,Z+2
+ 287 00c0 B381      		ldd r27,Z+3
+ 288 00c2 8481      		ldd r24,Z+4
+ 289 00c4 9111      		cpse r25,__zero_reg__
+ 290 00c6 00C0      		rjmp .L16
+ 140:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);
+ 292               	.LM20:
+ 293 00c8 9C91      		ld r25,X
+ 294 00ca 8095      		com r24
+ 295 00cc 8923      		and r24,r25
+ 296 00ce 00C0      		rjmp .L34
+ 297               	.L16:
+ 141:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 else
+ 142:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                     *_softpwm_channels[i].outport |= _softpwm_channels[i].pinmask;
+ 299               	.LM21:
+ 300 00d0 9C91      		ld r25,X
+ 301 00d2 892B      		or r24,r25
+ 302               	.L34:
+ 303 00d4 8C93      		st X,r24
+ 304               	.L15:
+ 305 00d6 3996      		adiw r30,9
+ 132:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     {
+ 307               	.LM22:
+ 308 00d8 80E0      		ldi r24,hi8(_softpwm_channels+180)
+ 309 00da E030      		cpi r30,lo8(_softpwm_channels+180)
+ 310 00dc F807      		cpc r31,r24
+ 311 00de 01F4      		brne .L3
+ 312               	/* epilogue start */
+ 143:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             }
+ 144:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         }
+ 145:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 146:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 314               	.LM23:
+ 315 00e0 FF91      		pop r31
+ 316 00e2 EF91      		pop r30
+ 317 00e4 BF91      		pop r27
+ 318 00e6 AF91      		pop r26
+ 319 00e8 9F91      		pop r25
+ 320 00ea 8F91      		pop r24
+ 321 00ec 7F91      		pop r23
+ 322 00ee 6F91      		pop r22
+ 323 00f0 4F91      		pop r20
+ 324 00f2 3F91      		pop r19
+ 325 00f4 2F91      		pop r18
+ 326 00f6 0F90      		pop r0
+ 327 00f8 0FBE      		out __SREG__,r0
+ 328 00fa 0F90      		pop r0
+ 329 00fc 1F90      		pop r1
+ 330 00fe 1895      		reti
+ 335               	.Lscope1:
+ 337               		.stabd	78,0,0
+ 340               	.global	_Z12SoftPWMBeginh
+ 342               	_Z12SoftPWMBeginh:
+ 343               		.stabd	46,0,0
+ 147:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 148:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 149:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** void SoftPWMBegin(uint8_t defaultPolarity) {
+ 345               	.LM24:
+ 346               	.LFBB2:
+ 347               	/* prologue: function */
+ 348               	/* frame size = 0 */
+ 349               	/* stack size = 0 */
+ 350               	.L__stack_usage = 0
+ 150:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // We can tweak the number of PWM period by changing the prescalar
+ 151:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // and the OCR - we'll default to ck/8 (CS21 set) and OCR=128.
+ 152:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // This gives 1024 cycles between interrupts.  And the ISR consumes ~200 cycles, so
+ 153:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // we are looking at about 20 - 30% of CPU time spent in the ISR.
+ 154:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // At these settings on a 16 MHz part, we will get a PWM period of
+ 155:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // approximately 60Hz (~16ms).
+ 156:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 157:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t i;
+ 158:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 159:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //#ifdef WIRING
+ 160:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //  Timer2.setMode(0b010);  // CTC
+ 161:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //  Timer2.setClockSource(CLOCK_PRESCALE_8);
+ 162:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //  Timer2.setOCR(CHANNEL_A, SOFTPWM_OCR);
+ 163:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //  Timer2.attachInterrupt(INTERRUPT_COMPARE_MATCH_A, SoftPWM_Timer_Interrupt);
+ 164:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //#else
+ 165:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //  SOFTPWM_TIMER_INIT(SOFTPWM_OCR);
+ 166:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //#endif
+ 167:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 168:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     cli();                   //Disable interrupts while setting registers
+ 352               	.LM25:
+ 353               	/* #APP */
+ 354               	 ;  168 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp" 1
+ 355 0100 F894      		cli
+ 356               	 ;  0 "" 2
+ 169:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     TCCR1A = 0;              // Make sure it is zero
+ 358               	.LM26:
+ 359               	/* #NOAPP */
+ 360 0102 1092 8000 		sts 128,__zero_reg__
+ 170:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     TCCR1B = 0;              // Make sure it is zero
+ 362               	.LM27:
+ 363 0106 1092 8100 		sts 129,__zero_reg__
+ 171:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     //TCCR1B = (1 << WGM21);   // Configure for CTC mode (Set it; don't OR stuff into it)
+ 172:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     //TCCR1B |= (1 << CS21); // Prescaler @ 1024
+ 173:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     TIMSK1 = (1 << OCIE1A);  // Enable interrupt
+ 365               	.LM28:
+ 366 010a 92E0      		ldi r25,lo8(2)
+ 367 010c 9093 6F00 		sts 111,r25
+ 174:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     OCR1A = SOFTPWM_OCR;           // compare value = 1 sec (16MHz AVR)
+ 369               	.LM29:
+ 370 0110 22E8      		ldi r18,lo8(-126)
+ 371 0112 30E0      		ldi r19,0
+ 372 0114 3093 8900 		sts 136+1,r19
+ 373 0118 2093 8800 		sts 136,r18
+ 175:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 176:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     TCCR1B = (1 << CS21);   /* start timer (ck/8 prescalar) */ \
+ 375               	.LM30:
+ 376 011c 9093 8100 		sts 129,r25
+ 177:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     TCCR1A = (1 << WGM21);  /* CTC mode */ \
+ 378               	.LM31:
+ 379 0120 9093 8000 		sts 128,r25
+ 178:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 179:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     sei();
+ 381               	.LM32:
+ 382               	/* #APP */
+ 383               	 ;  179 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp" 1
+ 384 0124 7894      		sei
+ 385               	 ;  0 "" 2
+ 386               	/* #NOAPP */
+ 387 0126 E0E0      		ldi r30,lo8(_softpwm_channels)
+ 388 0128 F0E0      		ldi r31,hi8(_softpwm_channels)
+ 180:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 181:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 182:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+ 183:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[i].pin = -1;
+ 390               	.LM33:
+ 391 012a 9FEF      		ldi r25,lo8(-1)
+ 392               	.L37:
+ 394               	.LM34:
+ 395 012c 9083      		st Z,r25
+ 184:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[i].polarity = SOFTPWM_NORMAL;
+ 397               	.LM35:
+ 398 012e 1182      		std Z+1,__zero_reg__
+ 185:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[i].outport = 0;
+ 400               	.LM36:
+ 401 0130 1382      		std Z+3,__zero_reg__
+ 402 0132 1282      		std Z+2,__zero_reg__
+ 186:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[i].fadeuprate = 0;
+ 404               	.LM37:
+ 405 0134 1782      		std Z+7,__zero_reg__
+ 187:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[i].fadedownrate = 0;
+ 407               	.LM38:
+ 408 0136 1086      		std Z+8,__zero_reg__
+ 409 0138 3996      		adiw r30,9
+ 182:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[i].pin = -1;
+ 411               	.LM39:
+ 412 013a 20E0      		ldi r18,hi8(_softpwm_channels+180)
+ 413 013c E030      		cpi r30,lo8(_softpwm_channels+180)
+ 414 013e F207      		cpc r31,r18
+ 415 0140 01F4      		brne .L37
+ 188:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 189:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 190:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     _softpwm_defaultPolarity = defaultPolarity;
+ 417               	.LM40:
+ 418 0142 8093 0000 		sts _softpwm_defaultPolarity,r24
+ 419 0146 0895      		ret
+ 421               	.Lscope2:
+ 423               		.stabd	78,0,0
+ 427               	.global	_Z18SoftPWMSetPolarityah
+ 429               	_Z18SoftPWMSetPolarityah:
+ 430               		.stabd	46,0,0
+ 191:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 192:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 193:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 194:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** void SoftPWMSetPolarity(int8_t pin, uint8_t polarity) {
+ 432               	.LM41:
+ 433               	.LFBB3:
+ 434               	/* prologue: function */
+ 435               	/* frame size = 0 */
+ 436               	/* stack size = 0 */
+ 437               	.L__stack_usage = 0
+ 195:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t i;
+ 196:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 197:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     if (polarity != SOFTPWM_NORMAL)
+ 198:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         polarity = SOFTPWM_INVERTED;
+ 439               	.LM42:
+ 440 0148 21E0      		ldi r18,lo8(1)
+ 441 014a 6111      		cpse r22,__zero_reg__
+ 442 014c 00C0      		rjmp .L40
+ 443 014e 20E0      		ldi r18,0
+ 444               	.L40:
+ 445 0150 E0E0      		ldi r30,lo8(_softpwm_channels)
+ 446 0152 F0E0      		ldi r31,hi8(_softpwm_channels)
+ 447 0154 94E1      		ldi r25,lo8(20)
+ 448               	.L44:
+ 199:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 200:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+ 201:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 450               	.LM43:
+ 451 0156 3081      		ld r19,Z
+ 452 0158 87FF      		sbrs r24,7
+ 453 015a 00C0      		rjmp .L41
+ 455               	.LM44:
+ 456 015c 37FF      		sbrs r19,7
+ 457 015e 00C0      		rjmp .L42
+ 458 0160 00C0      		rjmp .L43
+ 459               	.L41:
+ 202:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 461               	.LM45:
+ 462 0162 8313      		cpse r24,r19
+ 463 0164 00C0      		rjmp .L43
+ 464               	.L42:
+ 203:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         {
+ 204:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             _softpwm_channels[i].polarity = polarity;
+ 466               	.LM46:
+ 467 0166 2183      		std Z+1,r18
+ 468               	.L43:
+ 469 0168 9150      		subi r25,lo8(-(-1))
+ 470 016a 3996      		adiw r30,9
+ 200:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 472               	.LM47:
+ 473 016c 9111      		cpse r25,__zero_reg__
+ 474 016e 00C0      		rjmp .L44
+ 475               	/* epilogue start */
+ 205:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         }
+ 206:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 207:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 477               	.LM48:
+ 478 0170 0895      		ret
+ 480               	.Lscope3:
+ 482               		.stabd	78,0,0
+ 487               	.global	_Z10SoftPWMSetahh
+ 489               	_Z10SoftPWMSetahh:
+ 490               		.stabd	46,0,0
+ 208:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 209:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 210:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** void SoftPWMSetPercent(int8_t pin, uint8_t percent, uint8_t hardset) {
+ 211:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     SoftPWMSet(pin, ((uint16_t) percent * 255) / 100, hardset);
+ 212:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 213:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 214:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 215:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset) {
+ 492               	.LM49:
+ 493               	.LFBB4:
+ 494 0172 CF93      		push r28
+ 495               	/* prologue: function */
+ 496               	/* frame size = 0 */
+ 497               	/* stack size = 1 */
+ 498               	.L__stack_usage = 1
+ 216:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     int8_t firstfree = -1;  // first free index
+ 217:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t i;
+ 218:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 219:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     if (hardset) {
+ 500               	.LM50:
+ 501 0174 4423      		tst r20
+ 502 0176 01F0      		breq .L47
+ 220:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         SOFTPWM_TIMER_SET(0);
+ 504               	.LM51:
+ 505 0178 1092 8500 		sts 132+1,__zero_reg__
+ 506 017c 1092 8400 		sts 132,__zero_reg__
+ 221:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _isr_softcount = 0xff;
+ 508               	.LM52:
+ 509 0180 9FEF      		ldi r25,lo8(-1)
+ 510 0182 9093 0000 		sts _isr_softcount,r25
+ 511               	.L47:
+ 512 0186 E0E0      		ldi r30,lo8(_softpwm_channels)
+ 513 0188 F0E0      		ldi r31,hi8(_softpwm_channels)
+ 215:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     int8_t firstfree = -1;  // first free index
+ 515               	.LM53:
+ 516 018a 90E0      		ldi r25,0
+ 517 018c AFEF      		ldi r26,lo8(-1)
+ 518               	.L55:
+ 222:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 223:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 224:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     // If the pin isn't already set, add it
+ 225:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+ 226:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 520               	.LM54:
+ 521 018e 2081      		ld r18,Z
+ 522 0190 87FF      		sbrs r24,7
+ 523 0192 00C0      		rjmp .L48
+ 525               	.LM55:
+ 526 0194 27FF      		sbrs r18,7
+ 527 0196 00C0      		rjmp .L49
+ 528 0198 00C0      		rjmp .L72
+ 529               	.L48:
+ 227:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 531               	.LM56:
+ 532 019a 8217      		cp r24,r18
+ 533 019c 01F0      		breq .L49
+ 534               	.L53:
+ 228:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         {
+ 229:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             // set the pin (and exit, if individual pin)
+ 230:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             _softpwm_channels[i].pwmvalue = value;
+ 231:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 232:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (pin >= 0) // we've set the individual pin
+ 233:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 return;
+ 234:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         }
+ 235:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 236:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         // get the first free pin if available
+ 237:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if (firstfree < 0 && _softpwm_channels[i].pin < 0)
+ 536               	.LM57:
+ 537 019e AF3F      		cpi r26,lo8(-1)
+ 538 01a0 01F4      		brne .L52
+ 539 01a2 00C0      		rjmp .L73
+ 540               	.L49:
+ 230:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 542               	.LM58:
+ 543 01a4 6583      		std Z+5,r22
+ 232:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 return;
+ 545               	.LM59:
+ 546 01a6 87FD      		sbrc r24,7
+ 547 01a8 00C0      		rjmp .L53
+ 548 01aa 00C0      		rjmp .L46
+ 549               	.L73:
+ 551               	.LM60:
+ 552 01ac 2081      		ld r18,Z
+ 553 01ae 27FD      		sbrc r18,7
+ 554               	.L59:
+ 238:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             firstfree = i;
+ 556               	.LM61:
+ 557 01b0 A92F      		mov r26,r25
+ 558               	.L52:
+ 225:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 560               	.LM62:
+ 561 01b2 9F5F      		subi r25,lo8(-(1))
+ 562 01b4 3996      		adiw r30,9
+ 563 01b6 9431      		cpi r25,lo8(20)
+ 564 01b8 01F4      		brne .L55
+ 565               	.LBB2:
+ 239:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 240:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 241:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     if (pin >= 0 && firstfree >= 0) {
+ 567               	.LM63:
+ 568 01ba 87FD      		sbrc r24,7
+ 569 01bc 00C0      		rjmp .L46
+ 571               	.LM64:
+ 572 01be AF3F      		cpi r26,lo8(-1)
+ 573 01c0 01F4      		brne .+2
+ 574 01c2 00C0      		rjmp .L46
+ 575 01c4 C82F      		mov r28,r24
+ 576               	.LBB3:
+ 242:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         // we have a free pin we can use
+ 243:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[firstfree].pin = pin;
+ 578               	.LM65:
+ 579 01c6 89E0      		ldi r24,lo8(9)
+ 580 01c8 A802      		muls r26,r24
+ 581 01ca D001      		movw r26,r0
+ 582 01cc 1124      		clr __zero_reg__
+ 583 01ce A050      		subi r26,lo8(-(_softpwm_channels))
+ 584 01d0 B040      		sbci r27,hi8(-(_softpwm_channels))
+ 585 01d2 CC93      		st X,r28
+ 244:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[firstfree].polarity = _softpwm_defaultPolarity;
+ 587               	.LM66:
+ 588 01d4 2091 0000 		lds r18,_softpwm_defaultPolarity
+ 589 01d8 1196      		adiw r26,1
+ 590 01da 2C93      		st X,r18
+ 591 01dc 1197      		sbiw r26,1
+ 592               	.LBB4:
+ 593               	.LBB5:
+ 245:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[firstfree].outport = portOutputRegister(digitalPinToPort(pin));
+ 595               	.LM67:
+ 596 01de 8C2F      		mov r24,r28
+ 597 01e0 0C2E      		mov __tmp_reg__,r28
+ 598 01e2 000C      		lsl r0
+ 599 01e4 990B      		sbc r25,r25
+ 600 01e6 FC01      		movw r30,r24
+ 601 01e8 E050      		subi r30,lo8(-(digital_pin_to_port_PGM))
+ 602 01ea F040      		sbci r31,hi8(-(digital_pin_to_port_PGM))
+ 603               	/* #APP */
+ 604               	 ;  245 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp" 1
+ 605 01ec E491      		lpm r30, Z
+ 606               		
+ 607               	 ;  0 "" 2
+ 608               	/* #NOAPP */
+ 609               	.LBE5:
+ 610 01ee F0E0      		ldi r31,0
+ 611 01f0 EE0F      		lsl r30
+ 612 01f2 FF1F      		rol r31
+ 613 01f4 E050      		subi r30,lo8(-(port_to_output_PGM))
+ 614 01f6 F040      		sbci r31,hi8(-(port_to_output_PGM))
+ 615               	/* #APP */
+ 616               	 ;  245 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp" 1
+ 617 01f8 4591      		lpm r20, Z+
+ 618 01fa 5491      		lpm r21, Z
+ 619               		
+ 620               	 ;  0 "" 2
+ 621               	/* #NOAPP */
+ 622               	.LBE4:
+ 623 01fc 1396      		adiw r26,2+1
+ 624 01fe 5C93      		st X,r21
+ 625 0200 4E93      		st -X,r20
+ 626 0202 1297      		sbiw r26,2
+ 627               	.LBB6:
+ 246:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[firstfree].pinmask = digitalPinToBitMask(pin);
+ 629               	.LM68:
+ 630 0204 FC01      		movw r30,r24
+ 631 0206 E050      		subi r30,lo8(-(digital_pin_to_bit_mask_PGM))
+ 632 0208 F040      		sbci r31,hi8(-(digital_pin_to_bit_mask_PGM))
+ 633               	/* #APP */
+ 634               	 ;  246 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp" 1
+ 635 020a E491      		lpm r30, Z
+ 636               		
+ 637               	 ;  0 "" 2
+ 638               	/* #NOAPP */
+ 639 020c 1496      		adiw r26,4
+ 640 020e EC93      		st X,r30
+ 641 0210 1497      		sbiw r26,4
+ 642               	.LBE6:
+ 247:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         _softpwm_channels[firstfree].pwmvalue = value;
+ 644               	.LM69:
+ 645 0212 1596      		adiw r26,5
+ 646 0214 6C93      		st X,r22
+ 248:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** //    _softpwm_channels[firstfree].checkval = 0;
+ 249:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 250:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         // now prepare the pin for output
+ 251:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         // turn it off to start (no glitch)
+ 252:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if (_softpwm_defaultPolarity == SOFTPWM_NORMAL)
+ 648               	.LM70:
+ 649 0216 2111      		cpse r18,__zero_reg__
+ 650 0218 00C0      		rjmp .L57
+ 253:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             digitalWrite(pin, LOW);
+ 652               	.LM71:
+ 653 021a 60E0      		ldi r22,0
+ 654 021c 00C0      		rjmp .L71
+ 655               	.L57:
+ 254:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         else
+ 255:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             digitalWrite(pin, HIGH);
+ 657               	.LM72:
+ 658 021e 61E0      		ldi r22,lo8(1)
+ 659               	.L71:
+ 660 0220 8C2F      		mov r24,r28
+ 661 0222 0E94 0000 		call digitalWrite
+ 256:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         pinMode(pin, OUTPUT);
+ 663               	.LM73:
+ 664 0226 61E0      		ldi r22,lo8(1)
+ 665 0228 8C2F      		mov r24,r28
+ 666               	/* epilogue start */
+ 667               	.LBE3:
+ 668               	.LBE2:
+ 257:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 258:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 670               	.LM74:
+ 671 022a CF91      		pop r28
+ 672               	.LBB8:
+ 673               	.LBB7:
+ 256:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         pinMode(pin, OUTPUT);
+ 675               	.LM75:
+ 676 022c 0C94 0000 		jmp pinMode
+ 677               	.L72:
+ 678               	.LBE7:
+ 679               	.LBE8:
+ 237:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             firstfree = i;
+ 681               	.LM76:
+ 682 0230 AF3F      		cpi r26,lo8(-1)
+ 683 0232 01F0      		breq .+2
+ 684 0234 00C0      		rjmp .L52
+ 685 0236 00C0      		rjmp .L59
+ 686               	.L46:
+ 687               	/* epilogue start */
+ 689               	.LM77:
+ 690 0238 CF91      		pop r28
+ 691 023a 0895      		ret
+ 700               	.Lscope4:
+ 702               		.stabd	78,0,0
+ 707               	.global	_Z17SoftPWMSetPercentahh
+ 709               	_Z17SoftPWMSetPercentahh:
+ 710               		.stabd	46,0,0
+ 210:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     SoftPWMSet(pin, ((uint16_t) percent * 255) / 100, hardset);
+ 712               	.LM78:
+ 713               	.LFBB5:
+ 714               	/* prologue: function */
+ 715               	/* frame size = 0 */
+ 716               	/* stack size = 0 */
+ 717               	.L__stack_usage = 0
+ 718 023c 282F      		mov r18,r24
+ 211:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 720               	.LM79:
+ 721 023e 3FEF      		ldi r19,lo8(-1)
+ 722 0240 639F      		mul r22,r19
+ 723 0242 C001      		movw r24,r0
+ 724 0244 1124      		clr __zero_reg__
+ 725 0246 64E6      		ldi r22,lo8(100)
+ 726 0248 70E0      		ldi r23,0
+ 727 024a 0E94 0000 		call __udivmodhi4
+ 728 024e 822F      		mov r24,r18
+ 729 0250 0C94 0000 		jmp _Z10SoftPWMSetahh
+ 731               	.Lscope5:
+ 733               		.stabd	78,0,0
+ 736               	.global	_Z10SoftPWMEnda
+ 738               	_Z10SoftPWMEnda:
+ 739               		.stabd	46,0,0
+ 259:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 260:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** void SoftPWMEnd(int8_t pin) {
+ 741               	.LM80:
+ 742               	.LFBB6:
+ 743 0254 FF92      		push r15
+ 744 0256 0F93      		push r16
+ 745 0258 1F93      		push r17
+ 746 025a CF93      		push r28
+ 747 025c DF93      		push r29
+ 748               	/* prologue: function */
+ 749               	/* frame size = 0 */
+ 750               	/* stack size = 5 */
+ 751               	.L__stack_usage = 5
+ 752 025e 082F      		mov r16,r24
+ 753 0260 C0E0      		ldi r28,lo8(_softpwm_channels)
+ 754 0262 D0E0      		ldi r29,hi8(_softpwm_channels)
+ 756               	.LM81:
+ 757 0264 14E1      		ldi r17,lo8(20)
+ 261:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t i;
+ 262:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 263:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+ 264:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 265:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 266:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         {
+ 267:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             // now disable the pin (put it into INPUT mode)
+ 268:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             digitalWrite(_softpwm_channels[i].pin, 1);
+ 269:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             pinMode(_softpwm_channels[i].pin, INPUT);
+ 270:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 271:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             // remove the pin
+ 272:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             _softpwm_channels[i].pin = -1;
+ 759               	.LM82:
+ 760 0266 FF24      		clr r15
+ 761 0268 FA94      		dec r15
+ 762               	.L79:
+ 264:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 764               	.LM83:
+ 765 026a 8881      		ld r24,Y
+ 766 026c 07FF      		sbrs r16,7
+ 767 026e 00C0      		rjmp .L76
+ 264:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 769               	.LM84:
+ 770 0270 87FF      		sbrs r24,7
+ 771 0272 00C0      		rjmp .L77
+ 772 0274 00C0      		rjmp .L78
+ 773               	.L76:
+ 265:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         {
+ 775               	.LM85:
+ 776 0276 0813      		cpse r16,r24
+ 777 0278 00C0      		rjmp .L78
+ 778               	.L77:
+ 268:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             pinMode(_softpwm_channels[i].pin, INPUT);
+ 780               	.LM86:
+ 781 027a 61E0      		ldi r22,lo8(1)
+ 782 027c 8881      		ld r24,Y
+ 783 027e 0E94 0000 		call digitalWrite
+ 269:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 785               	.LM87:
+ 786 0282 60E0      		ldi r22,0
+ 787 0284 8881      		ld r24,Y
+ 788 0286 0E94 0000 		call pinMode
+ 790               	.LM88:
+ 791 028a F882      		st Y,r15
+ 792               	.L78:
+ 793 028c 1150      		subi r17,lo8(-(-1))
+ 794 028e 2996      		adiw r28,9
+ 263:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 796               	.LM89:
+ 797 0290 1111      		cpse r17,__zero_reg__
+ 798 0292 00C0      		rjmp .L79
+ 799               	/* epilogue start */
+ 273:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         }
+ 274:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 275:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 801               	.LM90:
+ 802 0294 DF91      		pop r29
+ 803 0296 CF91      		pop r28
+ 804 0298 1F91      		pop r17
+ 805 029a 0F91      		pop r16
+ 806 029c FF90      		pop r15
+ 807 029e 0895      		ret
+ 809               	.Lscope6:
+ 811               		.stabd	78,0,0
+ 816               	.global	_Z18SoftPWMSetFadeTimeajj
+ 818               	_Z18SoftPWMSetFadeTimeajj:
+ 819               		.stabd	46,0,0
+ 276:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 277:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 278:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** void SoftPWMSetFadeTime(int8_t pin, uint16_t fadeUpTime, uint16_t fadeDownTime) {
+ 821               	.LM91:
+ 822               	.LFBB7:
+ 823 02a0 2F92      		push r2
+ 824 02a2 3F92      		push r3
+ 825 02a4 4F92      		push r4
+ 826 02a6 5F92      		push r5
+ 827 02a8 6F92      		push r6
+ 828 02aa 7F92      		push r7
+ 829 02ac 8F92      		push r8
+ 830 02ae 9F92      		push r9
+ 831 02b0 AF92      		push r10
+ 832 02b2 BF92      		push r11
+ 833 02b4 CF92      		push r12
+ 834 02b6 DF92      		push r13
+ 835 02b8 EF92      		push r14
+ 836 02ba FF92      		push r15
+ 837 02bc 0F93      		push r16
+ 838 02be 1F93      		push r17
+ 839 02c0 CF93      		push r28
+ 840 02c2 DF93      		push r29
+ 841 02c4 00D0      		rcall .
+ 842 02c6 00D0      		rcall .
+ 843 02c8 CDB7      		in r28,__SP_L__
+ 844 02ca DEB7      		in r29,__SP_H__
+ 845               	/* prologue: function */
+ 846               	/* frame size = 4 */
+ 847               	/* stack size = 22 */
+ 848               	.L__stack_usage = 22
+ 849 02cc 382E      		mov r3,r24
+ 850 02ce 7A83      		std Y+2,r23
+ 851 02d0 6983      		std Y+1,r22
+ 852 02d2 8A01      		movw r16,r20
+ 853 02d4 80E0      		ldi r24,lo8(_softpwm_channels)
+ 854 02d6 90E0      		ldi r25,hi8(_softpwm_channels)
+ 855 02d8 9C83      		std Y+4,r25
+ 856 02da 8B83      		std Y+3,r24
+ 858               	.LM92:
+ 859 02dc 84E1      		ldi r24,lo8(20)
+ 860 02de 282E      		mov r2,r24
+ 279:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     int16_t fadeAmount;
+ 280:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     uint8_t i;
+ 281:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 282:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+ 283:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 284:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 285:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         {
+ 286:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 287:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             fadeAmount = 0;
+ 288:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (fadeUpTime > 0)
+ 289:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 fadeAmount = 255UL * (SOFTPWM_OCR * 256UL / (F_CPU / 8000UL)) / fadeUpTime;
+ 290:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 291:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             _softpwm_channels[i].fadeuprate = fadeAmount;
+ 292:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 293:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             fadeAmount = 0;
+ 294:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (fadeDownTime > 0)
+ 295:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 fadeAmount = 255UL * (SOFTPWM_OCR * 256UL / (F_CPU / 8000UL)) / fadeDownTime;
+ 862               	.LM93:
+ 863 02e0 4A01      		movw r8,r20
+ 864 02e2 A12C      		mov r10,__zero_reg__
+ 865 02e4 B12C      		mov r11,__zero_reg__
+ 866 02e6 90EF      		ldi r25,lo8(-16)
+ 867 02e8 C92E      		mov r12,r25
+ 868 02ea 9FE0      		ldi r25,lo8(15)
+ 869 02ec D92E      		mov r13,r25
+ 870 02ee E12C      		mov r14,__zero_reg__
+ 871 02f0 F12C      		mov r15,__zero_reg__
+ 289:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 873               	.LM94:
+ 874 02f2 2B01      		movw r4,r22
+ 875 02f4 612C      		mov r6,__zero_reg__
+ 876 02f6 712C      		mov r7,__zero_reg__
+ 877               	.L85:
+ 283:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 879               	.LM95:
+ 880 02f8 EB81      		ldd r30,Y+3
+ 881 02fa FC81      		ldd r31,Y+4
+ 882 02fc 8081      		ld r24,Z
+ 883 02fe 37FE      		sbrs r3,7
+ 884 0300 00C0      		rjmp .L82
+ 283:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+ 886               	.LM96:
+ 887 0302 87FF      		sbrs r24,7
+ 888 0304 00C0      		rjmp .L83
+ 889               	.L86:
+ 890 0306 2A94      		dec r2
+ 891 0308 8B81      		ldd r24,Y+3
+ 892 030a 9C81      		ldd r25,Y+4
+ 893 030c 0996      		adiw r24,9
+ 894 030e 9C83      		std Y+4,r25
+ 895 0310 8B83      		std Y+3,r24
+ 282:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
+ 897               	.LM97:
+ 898 0312 2110      		cpse r2,__zero_reg__
+ 899 0314 00C0      		rjmp .L85
+ 900 0316 00C0      		rjmp .L81
+ 901               	.L82:
+ 284:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         {
+ 903               	.LM98:
+ 904 0318 3812      		cpse r3,r24
+ 905 031a 00C0      		rjmp .L86
+ 906               	.L83:
+ 288:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 fadeAmount = 255UL * (SOFTPWM_OCR * 256UL / (F_CPU / 8000UL)) / fadeUpTime;
+ 908               	.LM99:
+ 909 031c 8981      		ldd r24,Y+1
+ 910 031e 9A81      		ldd r25,Y+2
+ 911 0320 892B      		or r24,r25
+ 912 0322 01F0      		breq .L89
+ 289:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 914               	.LM100:
+ 915 0324 C701      		movw r24,r14
+ 916 0326 B601      		movw r22,r12
+ 917 0328 A301      		movw r20,r6
+ 918 032a 9201      		movw r18,r4
+ 919 032c 0E94 0000 		call __udivmodsi4
+ 920 0330 00C0      		rjmp .L87
+ 921               	.L89:
+ 287:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (fadeUpTime > 0)
+ 923               	.LM101:
+ 924 0332 20E0      		ldi r18,0
+ 925               	.L87:
+ 291:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 927               	.LM102:
+ 928 0334 EB81      		ldd r30,Y+3
+ 929 0336 FC81      		ldd r31,Y+4
+ 930 0338 2783      		std Z+7,r18
+ 294:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 fadeAmount = 255UL * (SOFTPWM_OCR * 256UL / (F_CPU / 8000UL)) / fadeDownTime;
+ 932               	.LM103:
+ 933 033a 0115      		cp r16,__zero_reg__
+ 934 033c 1105      		cpc r17,__zero_reg__
+ 935 033e 01F0      		breq .L90
+ 937               	.LM104:
+ 938 0340 C701      		movw r24,r14
+ 939 0342 B601      		movw r22,r12
+ 940 0344 A501      		movw r20,r10
+ 941 0346 9401      		movw r18,r8
+ 942 0348 0E94 0000 		call __udivmodsi4
+ 943 034c 00C0      		rjmp .L88
+ 944               	.L90:
+ 293:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (fadeDownTime > 0)
+ 946               	.LM105:
+ 947 034e 20E0      		ldi r18,0
+ 948               	.L88:
+ 296:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 297:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             _softpwm_channels[i].fadedownrate = fadeAmount;
+ 950               	.LM106:
+ 951 0350 EB81      		ldd r30,Y+3
+ 952 0352 FC81      		ldd r31,Y+4
+ 953 0354 2087      		std Z+8,r18
+ 298:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** 
+ 299:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****             if (pin >= 0)  // we've set individual pin
+ 955               	.LM107:
+ 956 0356 37FC      		sbrc r3,7
+ 957 0358 00C0      		rjmp .L86
+ 958               	.L81:
+ 959               	/* epilogue start */
+ 300:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****                 break;
+ 301:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****         }
+ 302:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp ****     }
+ 303:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//libraries/SoftPWM/SoftPWM.cpp **** }
+ 961               	.LM108:
+ 962 035a 0F90      		pop __tmp_reg__
+ 963 035c 0F90      		pop __tmp_reg__
+ 964 035e 0F90      		pop __tmp_reg__
+ 965 0360 0F90      		pop __tmp_reg__
+ 966 0362 DF91      		pop r29
+ 967 0364 CF91      		pop r28
+ 968 0366 1F91      		pop r17
+ 969 0368 0F91      		pop r16
+ 970 036a FF90      		pop r15
+ 971 036c EF90      		pop r14
+ 972 036e DF90      		pop r13
+ 973 0370 CF90      		pop r12
+ 974 0372 BF90      		pop r11
+ 975 0374 AF90      		pop r10
+ 976 0376 9F90      		pop r9
+ 977 0378 8F90      		pop r8
+ 978 037a 7F90      		pop r7
+ 979 037c 6F90      		pop r6
+ 980 037e 5F90      		pop r5
+ 981 0380 4F90      		pop r4
+ 982 0382 3F90      		pop r3
+ 983 0384 2F90      		pop r2
+ 984 0386 0895      		ret
+ 986               	.Lscope7:
+ 988               		.stabd	78,0,0
+ 989               	.global	_softpwm_channels
+ 990               		.section .bss
+ 993               	_softpwm_channels:
+ 994 0000 0000 0000 		.zero	180
+ 994      0000 0000 
+ 994      0000 0000 
+ 994      0000 0000 
+ 994      0000 0000 
+ 995               	.global	_softpwm_defaultPolarity
+ 998               	_softpwm_defaultPolarity:
+ 999 00b4 00        		.zero	1
+ 1000               	.global	_isr_softcount
+ 1001               		.data
+ 1004               	_isr_softcount:
+ 1005 0000 FF        		.byte	-1
+ 1023               		.text
+ 1025               	.Letext0:
+ 1026               		.ident	"GCC: (GNU) 5.4.0"
+ 1027               	.global __do_copy_data
+ 1028               	.global __do_clear_bss
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 SoftPWM.cpp
+     /tmp/ccq9YFga.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccq9YFga.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccq9YFga.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccq9YFga.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccq9YFga.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccq9YFga.s:136    .text:0000000000000000 __vector_11
+     /tmp/ccq9YFga.s:1004   .data:0000000000000000 _isr_softcount
+     /tmp/ccq9YFga.s:993    .bss:0000000000000000 _softpwm_channels
+     /tmp/ccq9YFga.s:342    .text:0000000000000100 _Z12SoftPWMBeginh
+     /tmp/ccq9YFga.s:998    .bss:00000000000000b4 _softpwm_defaultPolarity
+     /tmp/ccq9YFga.s:429    .text:0000000000000148 _Z18SoftPWMSetPolarityah
+     /tmp/ccq9YFga.s:489    .text:0000000000000172 _Z10SoftPWMSetahh
+     /tmp/ccq9YFga.s:709    .text:000000000000023c _Z17SoftPWMSetPercentahh
+     /tmp/ccq9YFga.s:738    .text:0000000000000254 _Z10SoftPWMEnda
+     /tmp/ccq9YFga.s:818    .text:00000000000002a0 _Z18SoftPWMSetFadeTimeajj
+
+UNDEFINED SYMBOLS
+digital_pin_to_port_PGM
+port_to_output_PGM
+digital_pin_to_bit_mask_PGM
+digitalWrite
+pinMode
+__udivmodhi4
+__udivmodsi4
+__do_copy_data
+__do_clear_bss

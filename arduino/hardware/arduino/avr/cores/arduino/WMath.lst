@@ -1,0 +1,307 @@
+   1               		.file	"WMath.cpp"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+  82               	.global	_Z10randomSeedm
+  84               	_Z10randomSeedm:
+  85               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** /* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** /*
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   Part of the Wiring project - http://wiring.org.co
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   Copyright (c) 2004-06 Hernando Barragan
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   Modified 13 August 2006, David A. Mellis for Arduino - http://www.arduino.cc/
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   This library is free software; you can redistribute it and/or
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   modify it under the terms of the GNU Lesser General Public
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   License as published by the Free Software Foundation; either
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   version 2.1 of the License, or (at your option) any later version.
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   This library is distributed in the hope that it will be useful,
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   Lesser General Public License for more details.
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   You should have received a copy of the GNU Lesser General
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   Public License along with this library; if not, write to the
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   Boston, MA  02111-1307  USA
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** */
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** extern "C" {
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   #include "stdlib.h"
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** }
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** void randomSeed(unsigned long seed)
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** {
+  87               	.LM0:
+  88               	.LFBB1:
+  89               	/* prologue: function */
+  90               	/* frame size = 0 */
+  91               	/* stack size = 0 */
+  92               	.L__stack_usage = 0
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   if (seed != 0) {
+  94               	.LM1:
+  95 0000 6115      		cp r22,__zero_reg__
+  96 0002 7105      		cpc r23,__zero_reg__
+  97 0004 8105      		cpc r24,__zero_reg__
+  98 0006 9105      		cpc r25,__zero_reg__
+  99 0008 01F0      		breq .L1
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****     srandom(seed);
+ 101               	.LM2:
+ 102 000a 0C94 0000 		jmp srandom
+ 103               	.L1:
+ 104 000e 0895      		ret
+ 106               	.Lscope1:
+ 108               		.stabd	78,0,0
+ 111               	.global	_Z6randoml
+ 113               	_Z6randoml:
+ 114               		.stabd	46,0,0
+  32:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   }
+  33:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** }
+  34:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  35:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** long random(long howbig)
+  36:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** {
+ 116               	.LM3:
+ 117               	.LFBB2:
+ 118 0010 CF92      		push r12
+ 119 0012 DF92      		push r13
+ 120 0014 EF92      		push r14
+ 121 0016 FF92      		push r15
+ 122               	/* prologue: function */
+ 123               	/* frame size = 0 */
+ 124               	/* stack size = 4 */
+ 125               	.L__stack_usage = 4
+  37:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   if (howbig == 0) {
+ 127               	.LM4:
+ 128 0018 6115      		cp r22,__zero_reg__
+ 129 001a 7105      		cpc r23,__zero_reg__
+ 130 001c 8105      		cpc r24,__zero_reg__
+ 131 001e 9105      		cpc r25,__zero_reg__
+ 132 0020 01F0      		breq .L6
+ 133 0022 6B01      		movw r12,r22
+ 134 0024 7C01      		movw r14,r24
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****     return 0;
+  39:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   }
+  40:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   return random() % howbig;
+ 136               	.LM5:
+ 137 0026 0E94 0000 		call random
+ 138 002a A701      		movw r20,r14
+ 139 002c 9601      		movw r18,r12
+ 140 002e 0E94 0000 		call __divmodsi4
+ 141 0032 00C0      		rjmp .L5
+ 142               	.L6:
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****     return 0;
+ 144               	.LM6:
+ 145 0034 60E0      		ldi r22,0
+ 146 0036 70E0      		ldi r23,0
+ 147 0038 CB01      		movw r24,r22
+ 148               	.L5:
+ 149               	/* epilogue start */
+  41:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** }
+ 151               	.LM7:
+ 152 003a FF90      		pop r15
+ 153 003c EF90      		pop r14
+ 154 003e DF90      		pop r13
+ 155 0040 CF90      		pop r12
+ 156 0042 0895      		ret
+ 158               	.Lscope2:
+ 160               		.stabd	78,0,0
+ 164               	.global	_Z6randomll
+ 166               	_Z6randomll:
+ 167               		.stabd	46,0,0
+  42:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  43:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** long random(long howsmall, long howbig)
+  44:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** {
+ 169               	.LM8:
+ 170               	.LFBB3:
+ 171 0044 CF92      		push r12
+ 172 0046 DF92      		push r13
+ 173 0048 EF92      		push r14
+ 174 004a FF92      		push r15
+ 175 004c 0F93      		push r16
+ 176 004e 1F93      		push r17
+ 177               	/* prologue: function */
+ 178               	/* frame size = 0 */
+ 179               	/* stack size = 6 */
+ 180               	.L__stack_usage = 6
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   if (howsmall >= howbig) {
+ 182               	.LM9:
+ 183 0050 6217      		cp r22,r18
+ 184 0052 7307      		cpc r23,r19
+ 185 0054 8407      		cpc r24,r20
+ 186 0056 9507      		cpc r25,r21
+ 187 0058 04F4      		brge .L8
+ 188 005a 8901      		movw r16,r18
+ 189 005c 9A01      		movw r18,r20
+ 190 005e 6B01      		movw r12,r22
+ 191 0060 7C01      		movw r14,r24
+  46:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****     return howsmall;
+  47:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   }
+  48:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   long diff = howbig - howsmall;
+  49:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   return random(diff) + howsmall;
+ 193               	.LM10:
+ 194 0062 C901      		movw r24,r18
+ 195 0064 B801      		movw r22,r16
+ 196 0066 6C19      		sub r22,r12
+ 197 0068 7D09      		sbc r23,r13
+ 198 006a 8E09      		sbc r24,r14
+ 199 006c 9F09      		sbc r25,r15
+ 200 006e 0E94 0000 		call _Z6randoml
+ 201 0072 6C0D      		add r22,r12
+ 202 0074 7D1D      		adc r23,r13
+ 203 0076 8E1D      		adc r24,r14
+ 204 0078 9F1D      		adc r25,r15
+ 205               	.L8:
+ 206               	/* epilogue start */
+  50:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** }
+ 208               	.LM11:
+ 209 007a 1F91      		pop r17
+ 210 007c 0F91      		pop r16
+ 211 007e FF90      		pop r15
+ 212 0080 EF90      		pop r14
+ 213 0082 DF90      		pop r13
+ 214 0084 CF90      		pop r12
+ 215 0086 0895      		ret
+ 217               	.Lscope3:
+ 219               		.stabd	78,0,0
+ 226               	.global	_Z3maplllll
+ 228               	_Z3maplllll:
+ 229               		.stabd	46,0,0
+  51:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  52:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** long map(long x, long in_min, long in_max, long out_min, long out_max)
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** {
+ 231               	.LM12:
+ 232               	.LFBB4:
+ 233 0088 4F92      		push r4
+ 234 008a 5F92      		push r5
+ 235 008c 6F92      		push r6
+ 236 008e 7F92      		push r7
+ 237 0090 AF92      		push r10
+ 238 0092 BF92      		push r11
+ 239 0094 CF92      		push r12
+ 240 0096 DF92      		push r13
+ 241 0098 EF92      		push r14
+ 242 009a FF92      		push r15
+ 243 009c 0F93      		push r16
+ 244 009e 1F93      		push r17
+ 245 00a0 CF93      		push r28
+ 246 00a2 DF93      		push r29
+ 247 00a4 CDB7      		in r28,__SP_L__
+ 248 00a6 DEB7      		in r29,__SP_H__
+ 249               	/* prologue: function */
+ 250               	/* frame size = 0 */
+ 251               	/* stack size = 14 */
+ 252               	.L__stack_usage = 14
+ 253 00a8 2901      		movw r4,r18
+ 254 00aa 3A01      		movw r6,r20
+  54:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp ****   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+ 256               	.LM13:
+ 257 00ac 9B01      		movw r18,r22
+ 258 00ae AC01      		movw r20,r24
+ 259 00b0 2419      		sub r18,r4
+ 260 00b2 3509      		sbc r19,r5
+ 261 00b4 4609      		sbc r20,r6
+ 262 00b6 5709      		sbc r21,r7
+ 263 00b8 8989      		ldd r24,Y+17
+ 264 00ba 9A89      		ldd r25,Y+18
+ 265 00bc AB89      		ldd r26,Y+19
+ 266 00be BC89      		ldd r27,Y+20
+ 267 00c0 BC01      		movw r22,r24
+ 268 00c2 CD01      		movw r24,r26
+ 269 00c4 6A19      		sub r22,r10
+ 270 00c6 7B09      		sbc r23,r11
+ 271 00c8 8C09      		sbc r24,r12
+ 272 00ca 9D09      		sbc r25,r13
+ 273 00cc 0E94 0000 		call __mulsi3
+ 274 00d0 A801      		movw r20,r16
+ 275 00d2 9701      		movw r18,r14
+ 276 00d4 2419      		sub r18,r4
+ 277 00d6 3509      		sbc r19,r5
+ 278 00d8 4609      		sbc r20,r6
+ 279 00da 5709      		sbc r21,r7
+ 280 00dc 0E94 0000 		call __divmodsi4
+ 281 00e0 CA01      		movw r24,r20
+ 282 00e2 B901      		movw r22,r18
+ 283 00e4 6A0D      		add r22,r10
+ 284 00e6 7B1D      		adc r23,r11
+ 285 00e8 8C1D      		adc r24,r12
+ 286 00ea 9D1D      		adc r25,r13
+ 287               	/* epilogue start */
+  55:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** }
+ 289               	.LM14:
+ 290 00ec DF91      		pop r29
+ 291 00ee CF91      		pop r28
+ 292 00f0 1F91      		pop r17
+ 293 00f2 0F91      		pop r16
+ 294 00f4 FF90      		pop r15
+ 295 00f6 EF90      		pop r14
+ 296 00f8 DF90      		pop r13
+ 297 00fa CF90      		pop r12
+ 298 00fc BF90      		pop r11
+ 299 00fe AF90      		pop r10
+ 300 0100 7F90      		pop r7
+ 301 0102 6F90      		pop r6
+ 302 0104 5F90      		pop r5
+ 303 0106 4F90      		pop r4
+ 304 0108 0895      		ret
+ 307               	.Lscope4:
+ 309               		.stabd	78,0,0
+ 312               	.global	_Z8makeWordj
+ 314               	_Z8makeWordj:
+ 315               		.stabd	46,0,0
+  56:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** 
+  57:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** unsigned int makeWord(unsigned int w) { return w; }
+ 317               	.LM15:
+ 318               	.LFBB5:
+ 319               	/* prologue: function */
+ 320               	/* frame size = 0 */
+ 321               	/* stack size = 0 */
+ 322               	.L__stack_usage = 0
+ 324               	.LM16:
+ 325 010a 0895      		ret
+ 327               	.Lscope5:
+ 329               		.stabd	78,0,0
+ 333               	.global	_Z8makeWordhh
+ 335               	_Z8makeWordhh:
+ 336               		.stabd	46,0,0
+  58:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/cores/arduino/WMath.cpp **** unsigned int makeWord(unsigned char h, unsigned char l) { return (h << 8) | l; }
+ 338               	.LM17:
+ 339               	.LFBB6:
+ 340               	/* prologue: function */
+ 341               	/* frame size = 0 */
+ 342               	/* stack size = 0 */
+ 343               	.L__stack_usage = 0
+ 345               	.LM18:
+ 346 010c 70E0      		ldi r23,0
+ 347 010e 9B01      		movw r18,r22
+ 348 0110 382B      		or r19,r24
+ 349 0112 C901      		movw r24,r18
+ 350 0114 0895      		ret
+ 352               	.Lscope6:
+ 354               		.stabd	78,0,0
+ 356               	.Letext0:
+ 357               		.ident	"GCC: (GNU) 5.4.0"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 WMath.cpp
+     /tmp/ccjDyHpf.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccjDyHpf.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccjDyHpf.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccjDyHpf.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccjDyHpf.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccjDyHpf.s:84     .text:0000000000000000 _Z10randomSeedm
+     /tmp/ccjDyHpf.s:113    .text:0000000000000010 _Z6randoml
+     /tmp/ccjDyHpf.s:166    .text:0000000000000044 _Z6randomll
+     /tmp/ccjDyHpf.s:228    .text:0000000000000088 _Z3maplllll
+     /tmp/ccjDyHpf.s:314    .text:000000000000010a _Z8makeWordj
+     /tmp/ccjDyHpf.s:335    .text:000000000000010c _Z8makeWordhh
+
+UNDEFINED SYMBOLS
+srandom
+random
+__divmodsi4
+__mulsi3

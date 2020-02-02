@@ -1,0 +1,511 @@
+   1               		.file	"SPI.cpp"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   9               		.text
+  10               	.Ltext0:
+ 136               	.global	_ZN8SPIClass5beginEv
+ 138               	_ZN8SPIClass5beginEv:
+ 139               		.stabd	46,0,0
+   1:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** /*
+   2:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * Copyright (c) 2010 by Cristian Maglie <c.maglie@arduino.cc>
+   3:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * Copyright (c) 2014 by Paul Stoffregen <paul@pjrc.com> (Transaction API)
+   4:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * Copyright (c) 2014 by Matthijs Kooijman <matthijs@stdin.nl> (SPISettings AVR)
+   5:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * Copyright (c) 2014 by Andrew J. Kroll <xxxajk@gmail.com> (atomicity fixes)
+   6:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * SPI Master library for arduino.
+   7:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  *
+   8:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * This file is free software; you can redistribute it and/or modify
+   9:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * it under the terms of either the GNU General Public License version 2
+  10:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * or the GNU Lesser General Public License version 2.1, both as
+  11:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  * published by the Free Software Foundation.
+  12:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****  */
+  13:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  14:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #include "SPI.h"
+  15:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  16:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** SPIClass SPI;
+  17:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  18:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** uint8_t SPIClass::initialized = 0;
+  19:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** uint8_t SPIClass::interruptMode = 0;
+  20:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** uint8_t SPIClass::interruptMask = 0;
+  21:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** uint8_t SPIClass::interruptSave = 0;
+  22:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #ifdef SPI_TRANSACTION_MISMATCH_LED
+  23:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** uint8_t SPIClass::inTransactionFlag = 0;
+  24:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #endif
+  25:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  26:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** void SPIClass::begin()
+  27:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** {
+ 141               	.LM0:
+ 142               	.LFBB1:
+ 143 0000 CF93      		push r28
+ 144               	/* prologue: function */
+ 145               	/* frame size = 0 */
+ 146               	/* stack size = 1 */
+ 147               	.L__stack_usage = 1
+  28:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t sreg = SREG;
+ 149               	.LM1:
+ 150 0002 CFB7      		in r28,__SREG__
+  29:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   noInterrupts(); // Protect from a scheduler and prevent transactionBegin
+ 152               	.LM2:
+ 153               	/* #APP */
+ 154               	 ;  29 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI
+ 155 0004 F894      		cli
+ 156               	 ;  0 "" 2
+ 157               	/* #NOAPP */
+ 158               	.LBB2:
+  30:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   if (!initialized) {
+ 160               	.LM3:
+ 161 0006 8091 0000 		lds r24,_ZN8SPIClass11initializedE
+ 162 000a 8111      		cpse r24,__zero_reg__
+ 163 000c 00C0      		rjmp .L2
+ 164               	.LBB3:
+ 165               	.LBB4:
+  31:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // Set SS to high so a connected chip will be "deselected" by default
+  32:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     uint8_t port = digitalPinToPort(SS);
+ 167               	.LM4:
+ 168 000e E0E0      		ldi r30,lo8(digital_pin_to_port_PGM+10)
+ 169 0010 F0E0      		ldi r31,hi8(digital_pin_to_port_PGM+10)
+ 170               	/* #APP */
+ 171               	 ;  32 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI
+ 172 0012 8491      		lpm r24, Z
+ 173               		
+ 174               	 ;  0 "" 2
+ 175               	/* #NOAPP */
+ 176               	.LBE4:
+ 177               	.LBB5:
+  33:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     uint8_t bit = digitalPinToBitMask(SS);
+ 179               	.LM5:
+ 180 0014 E0E0      		ldi r30,lo8(digital_pin_to_bit_mask_PGM+10)
+ 181 0016 F0E0      		ldi r31,hi8(digital_pin_to_bit_mask_PGM+10)
+ 182               	/* #APP */
+ 183               	 ;  33 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI
+ 184 0018 9491      		lpm r25, Z
+ 185               		
+ 186               	 ;  0 "" 2
+ 187               	/* #NOAPP */
+ 188               	.LBE5:
+ 189               	.LBB6:
+  34:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     volatile uint8_t *reg = portModeRegister(port);
+ 191               	.LM6:
+ 192 001a E82F      		mov r30,r24
+ 193 001c F0E0      		ldi r31,0
+ 194 001e EE0F      		lsl r30
+ 195 0020 FF1F      		rol r31
+ 196 0022 E050      		subi r30,lo8(-(port_to_mode_PGM))
+ 197 0024 F040      		sbci r31,hi8(-(port_to_mode_PGM))
+ 198               	/* #APP */
+ 199               	 ;  34 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI
+ 200 0026 A591      		lpm r26, Z+
+ 201 0028 B491      		lpm r27, Z
+ 202               		
+ 203               	 ;  0 "" 2
+ 204               	/* #NOAPP */
+ 205               	.LBE6:
+  35:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  36:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // if the SS pin is not already configured as an output
+  37:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // then set it high (to enable the internal pull-up resistor)
+  38:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     if(!(*reg & bit)){
+ 207               	.LM7:
+ 208 002a EC91      		ld r30,X
+ 209 002c E923      		and r30,r25
+ 210 002e 01F4      		brne .L3
+  39:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****       digitalWrite(SS, HIGH);
+ 212               	.LM8:
+ 213 0030 61E0      		ldi r22,lo8(1)
+ 214 0032 8AE0      		ldi r24,lo8(10)
+ 215 0034 0E94 0000 		call digitalWrite
+ 216               	.L3:
+  40:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     }
+  41:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  42:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // When the SS pin is set as OUTPUT, it can be used as
+  43:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // a general purpose output port (it doesn't influence
+  44:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // SPI operations).
+  45:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     pinMode(SS, OUTPUT);
+ 218               	.LM9:
+ 219 0038 61E0      		ldi r22,lo8(1)
+ 220 003a 8AE0      		ldi r24,lo8(10)
+ 221 003c 0E94 0000 		call pinMode
+  46:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  47:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // Warning: if the SS pin ever becomes a LOW INPUT then SPI
+  48:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // automatically switches to Slave, so the data direction of
+  49:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // the SS pin MUST be kept as OUTPUT.
+  50:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     SPCR |= _BV(MSTR);
+ 223               	.LM10:
+ 224 0040 8CB5      		in r24,0x2c
+ 225 0042 8061      		ori r24,lo8(16)
+ 226 0044 8CBD      		out 0x2c,r24
+  51:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     SPCR |= _BV(SPE);
+ 228               	.LM11:
+ 229 0046 8CB5      		in r24,0x2c
+ 230 0048 8064      		ori r24,lo8(64)
+ 231 004a 8CBD      		out 0x2c,r24
+  52:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  53:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // Set direction register for SCK and MOSI pin.
+  54:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // MISO pin automatically overrides to INPUT.
+  55:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // By doing this AFTER enabling SPI, we avoid accidentally
+  56:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // clocking in a single bit since the lines go directly
+  57:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // from "input" to SPI control.
+  58:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // http://code.google.com/p/arduino/issues/detail?id=888
+  59:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     pinMode(SCK, OUTPUT);
+ 233               	.LM12:
+ 234 004c 61E0      		ldi r22,lo8(1)
+ 235 004e 8DE0      		ldi r24,lo8(13)
+ 236 0050 0E94 0000 		call pinMode
+  60:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     pinMode(MOSI, OUTPUT);
+ 238               	.LM13:
+ 239 0054 61E0      		ldi r22,lo8(1)
+ 240 0056 8BE0      		ldi r24,lo8(11)
+ 241 0058 0E94 0000 		call pinMode
+ 242               	.L2:
+ 243               	.LBE3:
+ 244               	.LBE2:
+  61:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   }
+  62:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   initialized++; // reference count
+ 246               	.LM14:
+ 247 005c 8091 0000 		lds r24,_ZN8SPIClass11initializedE
+ 248 0060 8F5F      		subi r24,lo8(-(1))
+ 249 0062 8093 0000 		sts _ZN8SPIClass11initializedE,r24
+  63:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   SREG = sreg;
+ 251               	.LM15:
+ 252 0066 CFBF      		out __SREG__,r28
+ 253               	/* epilogue start */
+  64:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** }
+ 255               	.LM16:
+ 256 0068 CF91      		pop r28
+ 257 006a 0895      		ret
+ 265               	.Lscope1:
+ 267               		.stabd	78,0,0
+ 269               	.global	_ZN8SPIClass3endEv
+ 271               	_ZN8SPIClass3endEv:
+ 272               		.stabd	46,0,0
+  65:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  66:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** void SPIClass::end() {
+ 274               	.LM17:
+ 275               	.LFBB2:
+ 276               	/* prologue: function */
+ 277               	/* frame size = 0 */
+ 278               	/* stack size = 0 */
+ 279               	.L__stack_usage = 0
+  67:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t sreg = SREG;
+ 281               	.LM18:
+ 282 006c 9FB7      		in r25,__SREG__
+  68:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   noInterrupts(); // Protect from a scheduler and prevent transactionBegin
+ 284               	.LM19:
+ 285               	/* #APP */
+ 286               	 ;  68 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI
+ 287 006e F894      		cli
+ 288               	 ;  0 "" 2
+  69:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   // Decrease the reference counter
+  70:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   if (initialized)
+ 290               	.LM20:
+ 291               	/* #NOAPP */
+ 292 0070 8091 0000 		lds r24,_ZN8SPIClass11initializedE
+ 293 0074 8823      		tst r24
+ 294 0076 01F0      		breq .L6
+  71:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     initialized--;
+ 296               	.LM21:
+ 297 0078 8150      		subi r24,lo8(-(-1))
+ 298 007a 8093 0000 		sts _ZN8SPIClass11initializedE,r24
+ 299               	.L6:
+  72:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   // If there are no more references disable SPI
+  73:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   if (!initialized) {
+ 301               	.LM22:
+ 302 007e 8091 0000 		lds r24,_ZN8SPIClass11initializedE
+ 303 0082 8111      		cpse r24,__zero_reg__
+ 304 0084 00C0      		rjmp .L7
+  74:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     SPCR &= ~_BV(SPE);
+ 306               	.LM23:
+ 307 0086 8CB5      		in r24,0x2c
+ 308 0088 8F7B      		andi r24,lo8(-65)
+ 309 008a 8CBD      		out 0x2c,r24
+  75:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     interruptMode = 0;
+ 311               	.LM24:
+ 312 008c 1092 0000 		sts _ZN8SPIClass13interruptModeE,__zero_reg__
+ 313               	.L7:
+  76:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     #ifdef SPI_TRANSACTION_MISMATCH_LED
+  77:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     inTransactionFlag = 0;
+  78:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     #endif
+  79:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   }
+  80:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   SREG = sreg;
+ 315               	.LM25:
+ 316 0090 9FBF      		out __SREG__,r25
+ 317 0092 0895      		ret
+ 322               	.Lscope2:
+ 324               		.stabd	78,0,0
+ 327               	.global	_ZN8SPIClass14usingInterruptEh
+ 329               	_ZN8SPIClass14usingInterruptEh:
+ 330               		.stabd	46,0,0
+  81:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** }
+  82:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+  83:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** // mapping of interrupt numbers to bits within SPI_AVR_EIMSK
+  84:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #if defined(__AVR_ATmega32U4__)
+  85:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT0_MASK  (1<<INT0)
+  86:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT1_MASK  (1<<INT1)
+  87:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT2_MASK  (1<<INT2)
+  88:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT3_MASK  (1<<INT3)
+  89:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT4_MASK  (1<<INT6)
+  90:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB1286__)
+  91:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT0_MASK  (1<<INT0)
+  92:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT1_MASK  (1<<INT1)
+  93:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT2_MASK  (1<<INT2)
+  94:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT3_MASK  (1<<INT3)
+  95:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT4_MASK  (1<<INT4)
+  96:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT5_MASK  (1<<INT5)
+  97:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT6_MASK  (1<<INT6)
+  98:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT7_MASK  (1<<INT7)
+  99:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #elif defined(EICRA) && defined(EICRB) && defined(EIMSK)
+ 100:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT0_MASK  (1<<INT4)
+ 101:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT1_MASK  (1<<INT5)
+ 102:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT2_MASK  (1<<INT0)
+ 103:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT3_MASK  (1<<INT1)
+ 104:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT4_MASK  (1<<INT2)
+ 105:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT5_MASK  (1<<INT3)
+ 106:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT6_MASK  (1<<INT6)
+ 107:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT7_MASK  (1<<INT7)
+ 108:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #else
+ 109:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef INT0
+ 110:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT0_MASK  (1<<INT0)
+ 111:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 112:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef INT1
+ 113:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT1_MASK  (1<<INT1)
+ 114:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 115:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef INT2
+ 116:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #define SPI_INT2_MASK  (1<<INT2)
+ 117:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 118:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** #endif
+ 119:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+ 120:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** void SPIClass::usingInterrupt(uint8_t interruptNumber)
+ 121:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** {
+ 332               	.LM26:
+ 333               	.LFBB3:
+ 334               	/* prologue: function */
+ 335               	/* frame size = 0 */
+ 336               	/* stack size = 0 */
+ 337               	.L__stack_usage = 0
+ 122:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t mask = 0;
+ 123:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t sreg = SREG;
+ 339               	.LM27:
+ 340 0094 9FB7      		in r25,__SREG__
+ 124:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   noInterrupts(); // Protect from a scheduler and prevent transactionBegin
+ 342               	.LM28:
+ 343               	/* #APP */
+ 344               	 ;  124 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SP
+ 345 0096 F894      		cli
+ 346               	 ;  0 "" 2
+ 125:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   switch (interruptNumber) {
+ 348               	.LM29:
+ 349               	/* #NOAPP */
+ 350 0098 8823      		tst r24
+ 351 009a 01F0      		breq .L16
+ 352 009c 8130      		cpi r24,lo8(1)
+ 353 009e 01F4      		brne .L17
+ 126:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT0_MASK
+ 127:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 0: mask = SPI_INT0_MASK; break;
+ 128:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 129:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT1_MASK
+ 130:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 1: mask = SPI_INT1_MASK; break;
+ 355               	.LM30:
+ 356 00a0 82E0      		ldi r24,lo8(2)
+ 357 00a2 00C0      		rjmp .L13
+ 358               	.L17:
+ 131:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 132:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT2_MASK
+ 133:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 2: mask = SPI_INT2_MASK; break;
+ 134:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 135:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT3_MASK
+ 136:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 3: mask = SPI_INT3_MASK; break;
+ 137:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 138:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT4_MASK
+ 139:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 4: mask = SPI_INT4_MASK; break;
+ 140:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 141:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT5_MASK
+ 142:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 5: mask = SPI_INT5_MASK; break;
+ 143:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 144:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT6_MASK
+ 145:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 6: mask = SPI_INT6_MASK; break;
+ 146:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 147:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT7_MASK
+ 148:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 7: mask = SPI_INT7_MASK; break;
+ 149:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 150:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   default:
+ 151:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     interruptMode = 2;
+ 360               	.LM31:
+ 361 00a4 82E0      		ldi r24,lo8(2)
+ 362 00a6 8093 0000 		sts _ZN8SPIClass13interruptModeE,r24
+ 122:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t sreg = SREG;
+ 364               	.LM32:
+ 365 00aa 80E0      		ldi r24,0
+ 152:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     break;
+ 367               	.LM33:
+ 368 00ac 00C0      		rjmp .L13
+ 369               	.L16:
+ 127:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 371               	.LM34:
+ 372 00ae 81E0      		ldi r24,lo8(1)
+ 373               	.L13:
+ 153:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   }
+ 154:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   interruptMask |= mask;
+ 375               	.LM35:
+ 376 00b0 2091 0000 		lds r18,_ZN8SPIClass13interruptMaskE
+ 377 00b4 822B      		or r24,r18
+ 378 00b6 8093 0000 		sts _ZN8SPIClass13interruptMaskE,r24
+ 155:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   if (!interruptMode)
+ 380               	.LM36:
+ 381 00ba 8091 0000 		lds r24,_ZN8SPIClass13interruptModeE
+ 382 00be 8111      		cpse r24,__zero_reg__
+ 383 00c0 00C0      		rjmp .L15
+ 156:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     interruptMode = 1;
+ 385               	.LM37:
+ 386 00c2 81E0      		ldi r24,lo8(1)
+ 387 00c4 8093 0000 		sts _ZN8SPIClass13interruptModeE,r24
+ 388               	.L15:
+ 157:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   SREG = sreg;
+ 390               	.LM38:
+ 391 00c8 9FBF      		out __SREG__,r25
+ 392 00ca 0895      		ret
+ 398               	.Lscope3:
+ 400               		.stabd	78,0,0
+ 403               	.global	_ZN8SPIClass17notUsingInterruptEh
+ 405               	_ZN8SPIClass17notUsingInterruptEh:
+ 406               		.stabd	46,0,0
+ 158:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** }
+ 159:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** 
+ 160:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** void SPIClass::notUsingInterrupt(uint8_t interruptNumber)
+ 161:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp **** {
+ 408               	.LM39:
+ 409               	.LFBB4:
+ 410               	/* prologue: function */
+ 411               	/* frame size = 0 */
+ 412               	/* stack size = 0 */
+ 413               	.L__stack_usage = 0
+ 162:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   // Once in mode 2 we can't go back to 0 without a proper reference count
+ 163:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   if (interruptMode == 2)
+ 415               	.LM40:
+ 416 00cc 9091 0000 		lds r25,_ZN8SPIClass13interruptModeE
+ 417 00d0 9230      		cpi r25,lo8(2)
+ 418 00d2 01F0      		breq .L18
+ 164:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     return;
+ 165:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t mask = 0;
+ 166:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t sreg = SREG;
+ 420               	.LM41:
+ 421 00d4 2FB7      		in r18,__SREG__
+ 167:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   noInterrupts(); // Protect from a scheduler and prevent transactionBegin
+ 423               	.LM42:
+ 424               	/* #APP */
+ 425               	 ;  167 "/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SP
+ 426 00d6 F894      		cli
+ 427               	 ;  0 "" 2
+ 168:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   switch (interruptNumber) {
+ 429               	.LM43:
+ 430               	/* #NOAPP */
+ 431 00d8 8823      		tst r24
+ 432 00da 01F0      		breq .L21
+ 433 00dc 8130      		cpi r24,lo8(1)
+ 434 00de 01F4      		brne .L29
+ 169:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT0_MASK
+ 170:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 0: mask = SPI_INT0_MASK; break;
+ 171:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 172:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT1_MASK
+ 173:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 1: mask = SPI_INT1_MASK; break;
+ 436               	.LM44:
+ 437 00e0 82E0      		ldi r24,lo8(2)
+ 438 00e2 00C0      		rjmp .L20
+ 439               	.L21:
+ 170:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 441               	.LM45:
+ 442 00e4 81E0      		ldi r24,lo8(1)
+ 443 00e6 00C0      		rjmp .L20
+ 444               	.L29:
+ 165:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   uint8_t sreg = SREG;
+ 446               	.LM46:
+ 447 00e8 80E0      		ldi r24,0
+ 448               	.L20:
+ 174:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 175:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT2_MASK
+ 176:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 2: mask = SPI_INT2_MASK; break;
+ 177:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 178:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT3_MASK
+ 179:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 3: mask = SPI_INT3_MASK; break;
+ 180:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 181:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT4_MASK
+ 182:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 4: mask = SPI_INT4_MASK; break;
+ 183:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 184:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT5_MASK
+ 185:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 5: mask = SPI_INT5_MASK; break;
+ 186:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 187:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT6_MASK
+ 188:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 6: mask = SPI_INT6_MASK; break;
+ 189:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 190:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #ifdef SPI_INT7_MASK
+ 191:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   case 7: mask = SPI_INT7_MASK; break;
+ 192:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   #endif
+ 193:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   default:
+ 194:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     break;
+ 195:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     // this case can't be reached
+ 196:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   }
+ 197:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   interruptMask &= ~mask;
+ 450               	.LM47:
+ 451 00ea 8095      		com r24
+ 452 00ec 9091 0000 		lds r25,_ZN8SPIClass13interruptMaskE
+ 453 00f0 8923      		and r24,r25
+ 454 00f2 8093 0000 		sts _ZN8SPIClass13interruptMaskE,r24
+ 198:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   if (!interruptMask)
+ 456               	.LM48:
+ 457 00f6 8111      		cpse r24,__zero_reg__
+ 458 00f8 00C0      		rjmp .L23
+ 199:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****     interruptMode = 0;
+ 460               	.LM49:
+ 461 00fa 1092 0000 		sts _ZN8SPIClass13interruptModeE,__zero_reg__
+ 462               	.L23:
+ 200:/home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8//hardware/arduino/avr/libraries/SPI/src/SPI.cpp ****   SREG = sreg;
+ 464               	.LM50:
+ 465 00fe 2FBF      		out __SREG__,r18
+ 466               	.L18:
+ 467 0100 0895      		ret
+ 473               	.Lscope4:
+ 475               		.stabd	78,0,0
+ 476               	.global	_ZN8SPIClass13interruptSaveE
+ 477               		.section .bss
+ 480               	_ZN8SPIClass13interruptSaveE:
+ 481 0000 00        		.zero	1
+ 482               	.global	_ZN8SPIClass13interruptMaskE
+ 485               	_ZN8SPIClass13interruptMaskE:
+ 486 0001 00        		.zero	1
+ 487               	.global	_ZN8SPIClass13interruptModeE
+ 490               	_ZN8SPIClass13interruptModeE:
+ 491 0002 00        		.zero	1
+ 492               	.global	_ZN8SPIClass11initializedE
+ 495               	_ZN8SPIClass11initializedE:
+ 496 0003 00        		.zero	1
+ 497               	.global	SPI
+ 500               	SPI:
+ 501 0004 00        		.zero	1
+ 521               		.text
+ 523               	.Letext0:
+ 524               		.ident	"GCC: (GNU) 5.4.0"
+ 525               	.global __do_clear_bss
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 SPI.cpp
+     /tmp/ccCycDrV.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccCycDrV.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccCycDrV.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccCycDrV.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccCycDrV.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccCycDrV.s:138    .text:0000000000000000 _ZN8SPIClass5beginEv
+     /tmp/ccCycDrV.s:495    .bss:0000000000000003 _ZN8SPIClass11initializedE
+     /tmp/ccCycDrV.s:271    .text:000000000000006c _ZN8SPIClass3endEv
+     /tmp/ccCycDrV.s:490    .bss:0000000000000002 _ZN8SPIClass13interruptModeE
+     /tmp/ccCycDrV.s:329    .text:0000000000000094 _ZN8SPIClass14usingInterruptEh
+     /tmp/ccCycDrV.s:485    .bss:0000000000000001 _ZN8SPIClass13interruptMaskE
+     /tmp/ccCycDrV.s:405    .text:00000000000000cc _ZN8SPIClass17notUsingInterruptEh
+     /tmp/ccCycDrV.s:480    .bss:0000000000000000 _ZN8SPIClass13interruptSaveE
+     /tmp/ccCycDrV.s:500    .bss:0000000000000004 SPI
+
+UNDEFINED SYMBOLS
+digital_pin_to_port_PGM
+digital_pin_to_bit_mask_PGM
+port_to_mode_PGM
+digitalWrite
+pinMode
+__do_clear_bss
