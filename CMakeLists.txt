@@ -1,25 +1,8 @@
 
-#
-#include_directories(arduino/hardware/arduino/variants/standard)
-#include_directories(arduino/hardware/arduino/avr/libraries/SPI/src)
-#include_directories(arduino/hardware/arduino/avr/cores/arduino)
-#include_directories(arduino/hardware/arduino/avr/variants/standard)
-#include_directories(arduino/libraries/RF24)
-#include_directories(arduino/libraries/SoftPWM)
-#include_directories(arduino/hardware/tools/avr/avr/include)
-#include_directories(./)
-##include_directories(arduino/hardware/tools/avr/avr/include/avr/iom328p.h)
-#
-
-
-# Project name
 project(battletank)
 
-# CMake version
 cmake_minimum_required(VERSION 2.6)
 
-# Options
-# Adjust to your board
 set(MCU "atmega328p" )
 set(CPU_SPEED "16000000" )
 set(PORT "/dev/ttyUSB0")
