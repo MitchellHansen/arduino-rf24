@@ -15,7 +15,6 @@
 #define CS_PIN 2
 #define RED 4
 #define GREEN 5
-#define F_CPU 8000000UL
 
 class Radio {
 

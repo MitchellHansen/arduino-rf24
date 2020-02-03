@@ -79,7 +79,7 @@ FORMAT = ihex
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = 
+ASRC =
 
 # Optional compiler flags.
 #  -g:        generate debugging information (for GDB, or for COFF conversion)
@@ -312,7 +312,7 @@ clean_list :
 	[ -s $@ ] || rm -f $@
 
 # Remove the '-' if you want to see the dependency files generated.
--include $(SRC:.c=.d)
+include $(SRC:.c=.d)
 
 -include $(PSRC:.cpp=.d)
 

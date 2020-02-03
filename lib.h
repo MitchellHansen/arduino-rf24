@@ -1,3 +1,4 @@
+
 void uart_init() {
     // Upper and lower bytes of the calculated prescaler value for baud.
     UBRR0H = UBRRH_VALUE;
