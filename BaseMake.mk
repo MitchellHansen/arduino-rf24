@@ -1,6 +1,6 @@
 
 # This Makefile includes the Arduino core sources. (Set ARDDIR here:)
-ARDDIR 				= /home/mrh/Downloads/arduino-1.8.8-linux64/arduino-1.8.8/
+ARDDIR 				= ./arduino
 
 ### These macros pertain to compiler flags
 # Target file name (without extension).
@@ -33,8 +33,10 @@ ARDLIBS2 = SPI
 ### These macros pertain to supporting Arduino libs
 ifndef NO_ARDUINO
 	LDFLAGS += -lm # -lm = math library
+
 	ARDLIBDIR 		= $(ARDDIR)/libraries
 	ARDLIBDIR2 		= $(ARDDIR)/hardware/arduino/avr/libraries
+
 	ARDCOREDIR 		= $(ARDDIR)/hardware/arduino/avr/cores/arduino
 
 	ifeq ($(MCU),atmega328p)
@@ -48,6 +50,7 @@ ifndef NO_ARDUINO
 	ifeq ($(MCU),attiny85)
 	EXTRAINCDIRS += $(ARDDIR)/hardware/attiny/variants/tiny8
 	endif
+
 	# add Arduino sources and include directories to PSRC and EXTRAINCDIRS
 
 	SRC += $(wildcard $(ARDCOREDIR)/*.c)
@@ -76,7 +79,7 @@ FORMAT = ihex
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(ARDDIR)/hardware/arduino/avr/cores/arduino/wiring_pulse.S
+ASRC = 
 
 # Optional compiler flags.
 #  -g:        generate debugging information (for GDB, or for COFF conversion)

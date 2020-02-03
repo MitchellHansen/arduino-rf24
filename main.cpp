@@ -17,6 +17,12 @@
 #define GREEN 5
 #define F_CPU 8000000UL
 
+class Radio {
+
+public:
+    RF24 instance;
+
+};
 
 class Motor {
 
