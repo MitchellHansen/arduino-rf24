@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(MCU "atmega328p" )
 set(CPU_SPEED "16000000" )
-set(PORT "/dev/ttyUSB0")
+set(PORT "/dev/ttyUSB1")
 set(PORT_SPEED "57600")
 set(PIN_VARIANT "standard")
 set(ARDUINO_PATH "arduino")
@@ -58,7 +58,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-Os -Wl,--gc-sections -mmcu=${MCU}")
 add_executable(${PROJECT_NAME} ${ARDUINO_CORE_SRC} ${SRC_FILES})
 
 add_custom_target(flash
-        COMMAND ${CMAKE_OBJCOPY} -j .text -j .data -O ihex ${PROJECT_NAME} ${PROJECT_NAME}.hex
+        COMMAND ${CMAKE_OBJCOPY} -j .text -j .data -O ihex ${PROJECT_NAME} main.hex
         COMMAND  avrdude -F -p${MCU} -carduino -P${PORT} -b${PORT_SPEED} -D -Uflash:w:main.hex:i
         DEPENDS ${PROJECT_NAME}
         )

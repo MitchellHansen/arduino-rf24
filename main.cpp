@@ -66,8 +66,8 @@ int main(void) {
     radio.startListening();
 
 
-    //SoftPWMSet(16, 255);
-    //SoftPWMSet(19, 255);
+    SoftPWMSet(17, 255);
+    SoftPWMSet(18, 255);
 
 
     //digitalWrite(18, HIGH);
