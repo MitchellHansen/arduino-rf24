@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(MCU "atmega328p" )
 set(CPU_SPEED "16000000" )
-set(PORT "/dev/ttyUSB1")
+set(PORT "/dev/ttyUSB0")
 set(PORT_SPEED "57600")
 set(PIN_VARIANT "standard")
 set(ARDUINO_PATH "arduino")
