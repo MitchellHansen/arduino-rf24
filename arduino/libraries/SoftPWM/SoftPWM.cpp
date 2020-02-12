@@ -96,42 +96,24 @@ ISR(TIMER1_COMPA_vect)
         // set all channels high - let's start again
         // and accept new checkvals
         for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
-            if (_softpwm_channels[i].fadeuprate > 0 || _softpwm_channels[i].fadedownrate > 0) {
-                // we want to fade to the new value
-                direction = _softpwm_channels[i].pwmvalue - _softpwm_channels[i].checkval;
 
-                // we will default to jumping to the new value
-                newvalue = _softpwm_channels[i].pwmvalue;
-
-                if (direction > 0 && _softpwm_channels[i].fadeuprate > 0) {
-                    newvalue = _softpwm_channels[i].checkval + _softpwm_channels[i].fadeuprate;
-                    if (newvalue > _softpwm_channels[i].pwmvalue)
-                        newvalue = _softpwm_channels[i].pwmvalue;
-                } else if (direction < 0 && _softpwm_channels[i].fadedownrate > 0) {
-                    newvalue = _softpwm_channels[i].checkval - _softpwm_channels[i].fadedownrate;
-                    if (newvalue < _softpwm_channels[i].pwmvalue)
-                        newvalue = _softpwm_channels[i].pwmvalue;
-                }
-
-                _softpwm_channels[i].checkval = newvalue;
-            } else  // just set the channel to the new value
-                _softpwm_channels[i].checkval = _softpwm_channels[i].pwmvalue;
+            // check on pwm, 0-255
+            _softpwm_channels[i].checkval = _softpwm_channels[i].pwmvalue;
 
             // now set the pin high (if not 0)
-            if (_softpwm_channels[i].checkval > 0)  // don't set if checkval == 0
+            if (_softpwm_channels[i].checkval > 0)
             {
                 if (_softpwm_channels[i].polarity == SOFTPWM_NORMAL)
                     *_softpwm_channels[i].outport |= _softpwm_channels[i].pinmask;
                 else
                     *_softpwm_channels[i].outport &= ~(_softpwm_channels[i].pinmask);
             }
-
         }
     }
 
     for (i = 0; i < SOFTPWM_MAXCHANNELS; i++)
     {
-        if (_softpwm_channels[i].pin >= 0)  // if it's a valid pin
+        if (_softpwm_channels[i].pin >= 0)  // Only set un-flagged pins
         {
             if (_softpwm_channels[i].checkval == _isr_softcount)  // if we have hit the width
             {
@@ -154,32 +136,17 @@ void SoftPWMBegin(uint8_t defaultPolarity) {
     // At these settings on a 16 MHz part, we will get a PWM period of
     // approximately 60Hz (~16ms).
 
-    uint8_t i;
-
-//#ifdef WIRING
-//  Timer2.setMode(0b010);  // CTC
-//  Timer2.setClockSource(CLOCK_PRESCALE_8);
-//  Timer2.setOCR(CHANNEL_A, SOFTPWM_OCR);
-//  Timer2.attachInterrupt(INTERRUPT_COMPARE_MATCH_A, SoftPWM_Timer_Interrupt);
-//#else
-//  SOFTPWM_TIMER_INIT(SOFTPWM_OCR);
-//#endif
-
-    cli();                   //Disable interrupts while setting registers
-    TCCR1A = 0;              // Make sure it is zero
-    TCCR1B = 0;              // Make sure it is zero
-    //TCCR1B = (1 << WGM21);   // Configure for CTC mode (Set it; don't OR stuff into it)
-    //TCCR1B |= (1 << CS21); // Prescaler @ 1024
+    // Hand init
+    cli();                   // Disable interrupts while setting registers
+    TCCR1A = 0;              // Reset the timer
+    TCCR1B = 0;              // Reset the timer
     TIMSK1 = (1 << OCIE1A);  // Enable interrupt
-    OCR1A = SOFTPWM_OCR;           // compare value = 1 sec (16MHz AVR)
-
     TCCR1B = (1 << CS21);   /* start timer (ck/8 prescalar) */ \
     TCCR1A = (1 << WGM21);  /* CTC mode */ \
-
+    OCR1A = SOFTPWM_OCR;     // compare value
     sei();
 
-
-    for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+    for (uint8_t i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
         _softpwm_channels[i].pin = -1;
         _softpwm_channels[i].polarity = SOFTPWM_NORMAL;
         _softpwm_channels[i].outport = 0;
@@ -207,24 +174,20 @@ void SoftPWMSetPolarity(int8_t pin, uint8_t polarity) {
 }
 
 
-void SoftPWMSetPercent(int8_t pin, uint8_t percent, uint8_t hardset) {
-    SoftPWMSet(pin, ((uint16_t) percent * 255) / 100, hardset);
-}
 
+void SoftPWMSet(uint8_t pin, uint8_t value, uint8_t hardset) {
 
-void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset) {
-    int8_t firstfree = -1;  // first free index
-    uint8_t i;
 
     if (hardset) {
         SOFTPWM_TIMER_SET(0);
         _isr_softcount = 0xff;
     }
 
+    int8_t firstfree = -1;  // first free index
+
     // If the pin isn't already set, add it
-    for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
-        if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
-            (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
+    for (uint8_t i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+        if (_softpwm_channels[i].pin == pin)
         {
             // set the pin (and exit, if individual pin)
             _softpwm_channels[i].pwmvalue = value;
@@ -238,7 +201,7 @@ void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset) {
             firstfree = i;
     }
 
-    if (pin >= 0 && firstfree >= 0) {
+    if (firstfree >= 0) {
         // we have a free pin we can use
         _softpwm_channels[firstfree].pin = pin;
         _softpwm_channels[firstfree].polarity = _softpwm_defaultPolarity;
@@ -257,20 +220,31 @@ void SoftPWMSet(int8_t pin, uint8_t value, uint8_t hardset) {
     }
 }
 
-void SoftPWMEnd(int8_t pin) {
-    uint8_t i;
+void SoftPWMEnd(uint8_t pin) {
 
-    for (i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
-        if ((pin < 0 && _softpwm_channels[i].pin >= 0) ||  // ALL pins
-            (pin >= 0 && _softpwm_channels[i].pin == pin))  // individual pin
-        {
-            // now disable the pin (put it into INPUT mode)
+    for (uint8_t i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+        if (_softpwm_channels[i].pin == pin) {
+
+            // Disable pin output
             digitalWrite(_softpwm_channels[i].pin, 1);
             pinMode(_softpwm_channels[i].pin, INPUT);
 
-            // remove the pin
+            // Flag as removed
             _softpwm_channels[i].pin = -1;
         }
+    }
+}
+
+void SoftPWMEndAll() {
+
+    for (uint8_t i = 0; i < SOFTPWM_MAXCHANNELS; i++) {
+
+        // Disable pin output
+        digitalWrite(_softpwm_channels[i].pin, 1);
+        pinMode(_softpwm_channels[i].pin, INPUT);
+
+        // Flag as removed
+        _softpwm_channels[i].pin = -1;
     }
 }
 

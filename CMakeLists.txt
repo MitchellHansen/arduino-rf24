@@ -3,9 +3,11 @@ project(battletank)
 
 cmake_minimum_required(VERSION 2.6)
 
+set(REMOTE_PORT "/dev/ttyUSB0")
+set(DOZER_PORT "/dev/ttyUSB1")
+
 set(MCU "atmega328p" )
 set(CPU_SPEED "16000000" )
-set(PORT "/dev/ttyUSB0")
 set(PORT_SPEED "57600")
 set(PIN_VARIANT "standard")
 set(ARDUINO_PATH "arduino")
@@ -14,7 +16,8 @@ set(COMPILE_FLAGS "")
 
 # Set own source files
 # Simply list all your C / C++ source (not header!) files here
-set(SRC_FILES main.cpp)
+set(REMOTE_SRC_FILES remote_main.cpp)
+set(DOZER_SRC_FILES dozer_main.cpp)
 
 # Include directories
 include_directories(
@@ -55,10 +58,17 @@ set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 set(CMAKE_EXE_LINKER_FLAGS "-Os -Wl,--gc-sections -mmcu=${MCU}")
 
-add_executable(${PROJECT_NAME} ${ARDUINO_CORE_SRC} ${SRC_FILES})
+add_executable(${PROJECT_NAME}-dozer ${ARDUINO_CORE_SRC} ${DOZER_SRC_FILES})
+add_executable(${PROJECT_NAME}-remote ${ARDUINO_CORE_SRC} ${REMOTE_SRC_FILES})
 
-add_custom_target(flash
-        COMMAND ${CMAKE_OBJCOPY} -j .text -j .data -O ihex ${PROJECT_NAME} main.hex
-        COMMAND  avrdude -F -p${MCU} -carduino -P${PORT} -b${PORT_SPEED} -D -Uflash:w:main.hex:i
-        DEPENDS ${PROJECT_NAME}
-        )
+add_custom_target(flash-dozer
+        COMMAND ${CMAKE_OBJCOPY} -j .text -j .data -O ihex ${PROJECT_NAME}-dozer main.hex
+        COMMAND  avrdude -F -p${MCU} -carduino -P${DOZER_PORT} -b${PORT_SPEED} -D -Uflash:w:main.hex:i
+        DEPENDS ${PROJECT_NAME}-dozer
+)
+
+add_custom_target(flash-remote
+        COMMAND ${CMAKE_OBJCOPY} -j .text -j .data -O ihex ${PROJECT_NAME}-remote main.hex
+        COMMAND  avrdude -F -p${MCU} -carduino -P${REMOTE_PORT} -b${PORT_SPEED} -D -Uflash:w:main.hex:i
+        DEPENDS ${PROJECT_NAME}-remote
+)
