@@ -1,0 +1,210 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L cad-parts:nRF24 U1
+U 1 1 5F508671
+P 7750 3700
+F 0 "U1" V 7700 3800 50  0001 C CNN
+F 1 "nRF24" H 7775 3983 50  0000 C CNN
+F 2 "cad-parts:nRF24" V 7700 3800 50  0001 C CNN
+F 3 "" V 7700 3800 50  0001 C CNN
+	1    7750 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L cad-parts:JOYSTICK-ALPS J1
+U 1 1 5F50A4B2
+P 8350 3050
+F 0 "J1" H 8528 3646 50  0000 L CNN
+F 1 "JOYSTICK-ALPS" H 8528 3555 50  0000 L CNN
+F 2 "cad-parts:JOYSTICK-ALPS" H 8350 3050 50  0001 C CNN
+F 3 "" H 8350 3050 50  0001 C CNN
+	1    8350 3050
+	1    0    0    -1  
+$EndComp
+$Comp
+L cad-parts:JOYSTICK-ALPS J2
+U 1 1 5F510B0B
+P 2600 2700
+F 0 "J2" H 2778 3296 50  0000 L CNN
+F 1 "JOYSTICK-ALPS" H 2778 3205 50  0000 L CNN
+F 2 "cad-parts:JOYSTICK-ALPS" H 2600 2700 50  0001 C CNN
+F 3 "" H 2600 2700 50  0001 C CNN
+	1    2600 2700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7450 3550 7150 3550
+Wire Wire Line
+	6700 3550 6700 4350
+Wire Wire Line
+	5350 3950 5100 3950
+Wire Wire Line
+	5100 3950 5100 4800
+Wire Wire Line
+	5100 4800 7450 4800
+Wire Wire Line
+	7450 4800 7450 3850
+Wire Wire Line
+	5350 4050 5250 4050
+Wire Wire Line
+	5250 4050 5250 4700
+Wire Wire Line
+	5250 4700 7300 4700
+Wire Wire Line
+	7300 4700 7300 3750
+Wire Wire Line
+	7300 3750 7450 3750
+Wire Wire Line
+	8100 3750 8350 3750
+Wire Wire Line
+	8350 3750 8350 4950
+Wire Wire Line
+	8350 4950 4850 4950
+Wire Wire Line
+	4850 4950 4850 3850
+Wire Wire Line
+	4850 3850 5350 3850
+Wire Wire Line
+	5350 3550 4650 3550
+Wire Wire Line
+	4650 3550 4650 5100
+Wire Wire Line
+	4650 5100 8500 5100
+Wire Wire Line
+	8500 5100 8500 3650
+Wire Wire Line
+	8500 3650 8100 3650
+Wire Wire Line
+	7500 2150 7500 2700
+Wire Wire Line
+	7500 3200 8100 3200
+Wire Wire Line
+	8100 3200 8100 3550
+Wire Wire Line
+	8050 2700 7500 2700
+Connection ~ 7500 2700
+Wire Wire Line
+	7500 2700 7500 3200
+Wire Wire Line
+	7150 3550 7150 2300
+Wire Wire Line
+	7150 2300 7700 2300
+Connection ~ 7150 3550
+Wire Wire Line
+	7150 3550 6700 3550
+Wire Wire Line
+	5350 3450 4500 3450
+Wire Wire Line
+	4500 3450 4500 5400
+Wire Wire Line
+	4500 5400 7100 5400
+Wire Wire Line
+	7100 5400 7100 3650
+Wire Wire Line
+	7100 3650 7450 3650
+Wire Wire Line
+	2300 1950 2150 1950
+Wire Wire Line
+	2150 1950 2150 1650
+Wire Wire Line
+	2150 1650 7700 1650
+Wire Wire Line
+	7700 1650 7700 2300
+Connection ~ 7700 2300
+Wire Wire Line
+	7700 2300 8050 2300
+Wire Wire Line
+	2300 2050 2050 2050
+Wire Wire Line
+	2300 2250 2200 2250
+Wire Wire Line
+	2200 2250 2200 3250
+Wire Wire Line
+	2200 3250 4400 3250
+Wire Wire Line
+	4400 3250 4400 1900
+Wire Wire Line
+	4400 1900 6600 1900
+Wire Wire Line
+	2300 2150 2150 2150
+Wire Wire Line
+	2150 2150 2150 3300
+Wire Wire Line
+	2150 3300 4500 3300
+Wire Wire Line
+	4500 3300 4500 1950
+Wire Wire Line
+	4500 1950 6550 1950
+Wire Wire Line
+	8050 2400 5000 2400
+Wire Wire Line
+	5000 2400 5000 3650
+Wire Wire Line
+	5750 2050 5750 2350
+Wire Wire Line
+	7500 2150 5950 2150
+Wire Wire Line
+	5950 2150 5950 2350
+Wire Wire Line
+	5950 2150 3500 2150
+Wire Wire Line
+	3500 2150 3500 2700
+Wire Wire Line
+	3500 2700 2300 2700
+Wire Wire Line
+	2300 2700 2300 2350
+Connection ~ 5950 2150
+Wire Wire Line
+	6500 2600 8050 2600
+Wire Wire Line
+	6700 4350 5950 4350
+Wire Wire Line
+	6500 2600 6500 3850
+$Comp
+L MCU_Module:Arduino_Nano_v2.x A1
+U 1 1 5F50914A
+P 5850 3350
+F 0 "A1" H 5850 2261 50  0000 C CNN
+F 1 "Arduino_Nano_v2.x" H 5850 2170 50  0000 C CNN
+F 2 "Module:Arduino_Nano" H 5850 3350 50  0001 C CIN
+F 3 "https://www.arduino.cc/en/uploads/Main/ArduinoNanoManual23.pdf" H 5850 3350 50  0001 C CNN
+	1    5850 3350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8050 2500 6450 2500
+Wire Wire Line
+	6450 2500 6450 3750
+Wire Wire Line
+	2050 3750 5350 3750
+Wire Wire Line
+	2050 2050 2050 3750
+Wire Wire Line
+	5000 3650 5350 3650
+Wire Wire Line
+	6550 1950 6550 4050
+Wire Wire Line
+	6600 1900 6600 3950
+Wire Wire Line
+	6550 4050 6350 4050
+Wire Wire Line
+	6600 3950 6350 3950
+Wire Wire Line
+	6450 3750 6350 3750
+Wire Wire Line
+	6350 3850 6500 3850
+$EndSCHEMATC
